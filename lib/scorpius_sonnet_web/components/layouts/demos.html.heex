@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="csrf-token" content={get_csrf_token()} />
+    <title>演示项目</title>
+    <%= raw(VitePhx.vite_client()) %>
+    <link rel="stylesheet" href={VitePhx.asset_path("app.css")} />
+  </head>
+  <body>
+    <nav class="bg-gray-800 text-white p-4">
+      <div class="container mx-auto">
+        <.link navigate={~p"/demos"} class="text-xl font-bold">演示项目</.link>
+      </div>
+    </nav>
+    
+    <%= @inner_content %>
+  </body>
+</html> 
