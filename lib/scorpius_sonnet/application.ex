@@ -20,6 +20,7 @@ defmodule ScorpiusSonnet.Application do
 
     children = [
       ScorpiusSonnetWeb.Telemetry,
+      ScorpiusSonnet.Repo,
       {DNSCluster, query: Application.get_env(:scorpius_sonnet, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: ScorpiusSonnet.PubSub},
       # Start the Finch HTTP client for sending emails
