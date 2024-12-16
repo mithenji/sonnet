@@ -47,7 +47,9 @@ defmodule ScorpiusSonnet.MixProject do
       {:dns_cluster, "~> 0.1.1"},
       {:plug_cowboy, "~> 2.5"},
       {:vite_phx, "~> 0.2"},
-      {:bandit, "~> 1.0"}
+      {:bandit, "~> 1.0"},
+      {:ecto_sql, "~> 3.10"},
+      {:postgrex, ">= 0.0.0"}
     ]
   end
 
