@@ -39,6 +39,7 @@ defmodule ScorpiusSonnet.Application do
     if Mix.env() == :dev do
       System.cmd("pkill", ["-f", "node"], stderr_to_stdout: true)
     end
+
     :ok
   end
 

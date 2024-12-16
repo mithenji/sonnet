@@ -26,7 +26,9 @@ config :scorpius_sonnet, ScorpiusSonnetWeb.Endpoint,
   check_origin: false,
   code_reloader: true,
   debug_errors: true,
-  watchers: [node: ["node_modules/vite/bin/vite.js", "dev", cd: Path.expand("../assets", __DIR__)]],
+  watchers: [
+    node: ["node_modules/vite/bin/vite.js", "dev", cd: Path.expand("../assets", __DIR__)]
+  ],
   secret_key_base: "WFmvLwnO8UTQAYS0cFzPvgfqbx4L3DFf7aC+k1SLG/203MbWb82nzDEMGZtA9PdG",
   live_reload: [
     patterns: [
