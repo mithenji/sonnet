@@ -1,0 +1,44 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:best-practices",
+    "customManagers:dockerfileVersions",
+    ":disableRateLimiting",
+    ":reviewer(Flo0807)"
+  ],
+  "packageRules": [
+    {
+      "groupName": "Elixir Image",
+      "matchDepNames": [
+        "elixir",
+        "erlang",
+        "ubuntu"
+      ]
+    },
+    {
+      "matchDepNames": [
+        "ubuntu"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "enabled": false
+    },
+    {
+      "matchDatasources": [
+        "docker"
+      ],
+      "pinDigests": false
+    },
+    {
+      "matchManagers": [
+        "github-actions"
+      ],
+      "automerge": true
+    }
+  ],
+  "labels": [
+    "dependencies",
+    "{{categories}}"
+  ]
+}

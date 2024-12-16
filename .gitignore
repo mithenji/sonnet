@@ -35,3 +35,21 @@ scorpius_sonnet-*.tar
 npm-debug.log
 /assets/node_modules/
 
+# Ignore macOS metadata files.
+.DS_Store
+
+# Ignore Elixir Language Server configuration.
+.elixir_ls
+
+# Ignore Cursor rules configuration.
+.cursorrules
+
+# Ignore IntelliJ IDEA project configuration.
+.idea
+
+# Ignore environment variables.
+.env
+.sonnet_env
+
+# NGINX
+sonnet.mithenji.me.conf

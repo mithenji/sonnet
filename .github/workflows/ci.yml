@@ -1,0 +1,161 @@
+name: CI
+
+on:
+  push:
+    branches: [ 'main' ]
+    tags: [ 'v*' ]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  test:
+    name: Test app
+    runs-on: ubuntu-latest
+    env:
+      MIX_ENV: test
+
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+
+      - uses: erlef/setup-beam@5304e04ea2b355f03681464e683d92e3b2f18451 # v1
+        id: beam
+        with:
+          version-file: .tool-versions
+          version-type: strict
+
+      - name: Restore the deps and _build cache
+        uses: actions/cache@6849a6489940f00c2f30c0fb92c6274307ccb58a # v4
+        id: restore-cache
+        env:
+          OTP_VERSION: ${{ steps.beam.outputs.otp-version }}
+          ELIXIR_VERSION: ${{ steps.beam.outputs.elixir-version }}
+          MIX_LOCK_HASH: ${{ hashFiles('**/mix.lock') }}
+        with:
+          path: |
+            deps
+            _build
+          key: ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-mixlockhash-${{ env.MIX_LOCK_HASH }}
+
+      - name: Install mix dependencies
+        if: steps.restore-cache.outputs.cache-hit != 'true'
+        run: mix deps.get
+
+      - name: Compile dependencies
+        if: steps.restore-cache.outputs.cache-hit != 'true'
+        run: mix deps.compile
+
+      - name: Compile
+        run: mix compile --warnings-as-errors --force
+
+      - name: Check Formatting
+        run: mix format --check-formatted
+
+      - name: Check unused deps
+        run: mix deps.unlock --check-unused
+
+      - name: Credo
+        run: mix credo
+
+      - name: Run Tests
+        run: mix test
+  build:
+    name: Build and push image to ghcr
+    needs: test
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+
+      - name: Lowercase image name
+        run: echo "IMAGE_NAME=$(echo "$IMAGE_NAME" | awk '{print tolower($0)}')" >> $GITHUB_ENV
+
+      - name: Log in to the container registry
+        uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_SONNET_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@c47758b77c9736f4b2ef4073d4d51994fabfe349 # v3
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@8e5442c4ef9f78752691e2d8f8d19755c6f78e81 # v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=ref,event=branch
+            type=sha,format=short
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+
+      - name: Build and push
+        uses: docker/build-push-action@4f58ea79222b3b9dc2c8bbdd6debcef730109a75 # v6
+        with:
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    name: Deploy to Alibaba Cloud ECS
+    needs: build
+    runs-on: ubuntu-latest
+    env:
+      HOST: ${{ secrets.ECS_HOST }}
+      USER: ${{ secrets.ECS_USER }}
+      SSH_KEY: ${{ secrets.ECS_SSH_KEY }}
+      DOCKER_PASSWORD: ${{ secrets.GHCR_SONNET_TOKEN }}
+      IMAGE_TAG: ${{ github.sha }}
+
+    steps:
+      - name: Deploy to ECS via SSH
+        run: |
+          # 配置 SSH 以保持连接活跃
+          mkdir -p ~/.ssh
+          echo "ServerAliveInterval 30" >> ~/.ssh/config
+          echo "ServerAliveCountMax 60" >> ~/.ssh/config
+          
+          eval "$(ssh-agent -s)"
+          echo "$SSH_KEY" | tr -d '\r' | ssh-add -
+          ssh -o StrictHostKeyChecking=no $USER@$HOST << EOF
+            # 使用提交 SHA 作为镜像标签以确保部署确定性
+            IMAGE=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:sha-$(echo ${{ github.sha }} | cut -c1-7)
+            
+            echo "Debug information:"
+            echo "Registry: ${{ env.REGISTRY }}"
+            echo "Image name: ${{ env.IMAGE_NAME }}"
+            echo "Full image path: \$IMAGE"
+            
+            # 登录 Docker registry
+            echo "${{ secrets.GHCR_SONNET_TOKEN }}" | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
+            
+            # 设置环境变量供 docker-compose 使用
+            export IMAGE_NAME=\$IMAGE
+            
+            # 指定工作目录
+            cd /home/mithenji/
+
+            echo "停止并删除旧容器..."
+            docker-compose down --remove-orphans
+            docker rm -f sonnet || true
+            
+            echo "拉取最新镜像..."
+            docker-compose pull
+            
+            echo "更新服务..."
+            docker-compose up -d --remove-orphans
+            
+            echo "清理未使用的镜像..."
+            docker image prune -f
+          EOF

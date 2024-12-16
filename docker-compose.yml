@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  mithenji.me:
+    image: ${IMAGE_NAME}
+    container_name: mithenji.me
+    env_file: /home/mithenji/.env
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+
+  sonnet:
+    image: ${IMAGE_NAME}
+    container_name: sonnet.mithenji.me
+    env_file: /home/mithenji/.sonnet_env
+    ports:
+      - "4080:4080"
+    restart: unless-stopped 
