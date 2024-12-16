@@ -49,7 +49,8 @@ defmodule ScorpiusSonnet.MixProject do
       {:vite_phx, "~> 0.2"},
       {:bandit, "~> 1.0"},
       {:ecto_sql, "~> 3.10"},
-      {:postgrex, ">= 0.0.0"}
+      {:postgrex, ">= 0.0.0"},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
     ]
   end
 
