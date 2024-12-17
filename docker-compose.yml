@@ -14,5 +14,5 @@ services:
     container_name: sonnet.mithenji.me
     env_file: /home/mithenji/.sonnet_env
     ports:
-      - "4080:4080"
+      - "4080:80"
     restart: unless-stopped 
