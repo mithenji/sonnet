@@ -146,16 +146,16 @@ jobs:
             # 指定工作目录
             cd /home/mithenji/
 
-            echo "停止并删除旧容器..."
-            docker-compose down --remove-orphans
-            docker rm -f sonnet || true
+            echo "停止并删除旧的 sonnet 容器..."
+            docker-compose stop sonnet
+            docker-compose rm -f sonnet
             
-            echo "拉取最新镜像..."
-            docker-compose pull
+            echo "拉取最新的 sonnet 镜像..."
+            docker-compose pull sonnet
             
-            echo "更新服务..."
-            docker-compose up -d --remove-orphans
+            echo "更新 sonnet 服务..."
+            docker-compose up -d sonnet
             
-            echo "清理未使用的镜像..."
-            docker image prune -f
+            echo "清理未使用的 sonnet 相关镜像..."
+            docker images | grep sonnet | awk '{print $3}' | xargs -r docker rmi
           EOF

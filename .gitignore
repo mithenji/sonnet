@@ -51,5 +51,7 @@ npm-debug.log
 .env
 .sonnet_env
 
+docker-compose.yml
+
 # NGINX
 sonnet.mithenji.me.conf
