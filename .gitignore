@@ -51,6 +51,7 @@ npm-debug.log
 .env
 .sonnet_env
 
+# Docker
 docker-compose.yml
 
 # NGINX
