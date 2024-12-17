@@ -1,14 +1,15 @@
 import Config
 
 # Configure your database
-config :scorpius_sonnet, ScorpiusSonnet.Repo,
-  username: "postgres",
-  password: "postgres",
-  hostname: "localhost",
-  database: "scorpius_sonnet_dev",
-  stacktrace: true,
-  show_sensitive_data_on_connection_error: true,
-  pool_size: 10
+# config :scorpius_sonnet, ScorpiusSonnet.Repo,
+#   username: "postgres",
+#   password: "postgres",
+#   hostname: "localhost",
+#   database: "scorpius_sonnet_dev",
+#   stacktrace: true,
+#   show_sensitive_data_on_connection_error: true,
+#   pool_size: 10,
+#   port: 5432
 
 # For development, we disable any cache and enable
 # debugging and code reloading.

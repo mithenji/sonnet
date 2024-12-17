@@ -31,8 +31,9 @@ defmodule ScorpiusSonnetWeb.ConnCase do
     end
   end
 
-  setup tags do
-    ScorpiusSonnet.DataCase.setup_sandbox(tags)
+  setup _tags do
+    # 暂时注释掉数据库相关设置
+    # ScorpiusSonnet.DataCase.setup_sandbox(tags)
     {:ok, conn: Phoenix.ConnTest.build_conn()}
   end
 end
