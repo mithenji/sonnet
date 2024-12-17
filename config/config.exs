@@ -51,3 +51,5 @@ config :vite_phx,
   release_app: :scorpius_sonnet,
   environment: Mix.env(),
   vite_manifest: "priv/static/manifest.json"
+
+config :scorpius_sonnet, :env, Mix.env()

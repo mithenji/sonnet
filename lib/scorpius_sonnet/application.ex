@@ -7,11 +7,13 @@ defmodule ScorpiusSonnet.Application do
 
   @impl true
   def start(_type, _args) do
-    # 清理可能存在的旧进程
-    System.cmd("pkill", ["-f", "node"], stderr_to_stdout: true)
+    # 只在开发环境清理进程
+    if Application.get_env(:scorpius_sonnet, :env) == :dev do
+      System.cmd("pkill", ["-f", "node"], stderr_to_stdout: true)
+    end
 
-    # 在开发环境启动 Vite
-    if Mix.env() == :dev do
+    # 只在开发环境启动 Vite
+    if Application.get_env(:scorpius_sonnet, :env) == :dev do
       Port.open(
         {:spawn, "cd assets && npm run dev"},
         [:binary, :exit_status, :stderr_to_stdout]
@@ -38,7 +40,7 @@ defmodule ScorpiusSonnet.Application do
 
   @impl true
   def stop(_state) do
-    if Mix.env() == :dev do
+    if Application.get_env(:scorpius_sonnet, :env) == :dev do
       System.cmd("pkill", ["-f", "node"], stderr_to_stdout: true)
     end
 
