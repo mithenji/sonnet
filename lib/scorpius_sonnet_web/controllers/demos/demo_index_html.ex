@@ -1,7 +1,7 @@
-defmodule ScorpiusSonnetWeb.Demos.DemoHTML do
+defmodule ScorpiusSonnetWeb.Demos.DemoIndexHTML do
   use ScorpiusSonnetWeb, :html
 
-  embed_templates "demo_html/*"
+  embed_templates "demo_index_html/*"
 
   # 获取资产哈希值的辅助函数
   def get_asset_hash do

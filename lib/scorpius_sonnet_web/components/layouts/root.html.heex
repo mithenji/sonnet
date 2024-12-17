@@ -7,9 +7,8 @@
     <.live_title suffix=" · Phoenix Framework">
       <%= assigns[:page_title] || "ScorpiusSonnet" %>
     </.live_title>
-    <link phx-track-static rel="stylesheet" href={~p"/assets/app.css"} />
-    <script defer phx-track-static type="text/javascript" src={~p"/assets/app.js"}>
-    </script>
+    <%= raw(VitePhx.vite_client()) %>
+    <script type="module" src={VitePhx.asset_path("main/app.js")}></script>
   </head>
   <body class="bg-white">
     <%= @inner_content %>

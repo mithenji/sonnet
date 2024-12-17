@@ -37,6 +37,11 @@ config :scorpius_sonnet, ScorpiusSonnetWeb.Endpoint,
       ~r"lib/scorpius_sonnet_web/(controllers|live|components)/.*(ex|heex)$"
     ],
     timeout: 600
+  ],
+  vite_dev_server: [
+    host: "localhost",
+    port: 5175,
+    protocol: "http"
   ]
 
 # ## SSL Support

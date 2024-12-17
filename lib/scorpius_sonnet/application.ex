@@ -14,10 +14,15 @@ defmodule ScorpiusSonnet.Application do
 
     # 只在开发环境启动 Vite
     if Application.get_env(:scorpius_sonnet, :env) == :dev do
-      Port.open(
+      require Logger
+      Logger.info("Starting Vite development server...")
+
+      port = Port.open(
         {:spawn, "cd assets && npm run dev"},
         [:binary, :exit_status, :stderr_to_stdout]
       )
+
+      Logger.info("Vite server started with port: #{inspect(port)}")
     end
 
     children = [

@@ -1,0 +1,14 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+/* Christmas specific styles */
+.christmas-demo {
+  min-height: 100vh;
+  padding: 2rem;
+  background: linear-gradient(to bottom, #ffffff, #f0f0f0);
+}
+
+.christmas-tree {
+  font-size: 4rem;
+} 

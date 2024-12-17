@@ -1,4 +1,5 @@
 import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
 import vue from '@vitejs/plugin-vue'
 import path from 'path'
 import fs from 'fs'
@@ -16,9 +17,13 @@ function getDemoEntries() {
       .map(dirent => dirent.name)
 
     demos.forEach(demo => {
-      const entryPath = path.resolve(demoDir, demo, 'main.js')
-      if (fs.existsSync(entryPath)) {
-        entries[demo] = entryPath
+      const jsxPath = path.resolve(demoDir, demo, 'main.jsx')
+      const jsPath = path.resolve(demoDir, demo, 'main.js')
+      
+      if (fs.existsSync(jsxPath)) {
+        entries[`demos/${demo}`] = jsxPath
+      } else if (fs.existsSync(jsPath)) {
+        entries[`demos/${demo}`] = jsPath
       }
     })
   }
@@ -27,7 +32,12 @@ function getDemoEntries() {
 }
 
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [
+    react({
+      jsxRuntime: 'automatic',
+    }),
+    vue()
+  ],
   css: {
     postcss: {
       plugins: [
@@ -42,32 +52,30 @@ export default defineConfig({
     emptyOutDir: true,
     rollupOptions: {
       input: {
-        main: path.resolve(__dirname, 'ECMAScript/app.js'),
-        // admin: path.resolve(__dirname, 'ECMAScript/admin.js'),
+        app: path.resolve(__dirname, 'main/app.js'),
         ...getDemoEntries()
       },
       output: {
-        // 根据入口名称生成目录结构
         entryFileNames: (chunkInfo) => {
-          const name = chunkInfo.name
-          if (name.startsWith('demos/')) {
-            return `assets/${name}/[name]-[hash].js`
+          if (chunkInfo.facadeModuleId.includes('demos/')) {
+            const demoName = chunkInfo.facadeModuleId.match(/demos\/([^/]+)/)[1]
+            return `assets/demos/${demoName}/${demoName}-[hash].js`
           }
-          return 'assets/[name]-[hash].js'
+          return 'assets/main/main-[hash].js'
         },
         chunkFileNames: (chunkInfo) => {
-          const name = chunkInfo.name
-          if (name.startsWith('demos/')) {
-            return `assets/${name}/chunks/[name]-[hash].js`
+          if (chunkInfo.facadeModuleId.includes('demos/')) {
+            const demoName = chunkInfo.facadeModuleId.match(/demos\/([^/]+)/)[1]
+            return `assets/demos/${demoName}/chunks/${demoName}-[hash].js`
           }
-          return 'assets/chunks/[name]-[hash].js'
+          return 'assets/main/chunks/main-[hash].js'
         },
         assetFileNames: (assetInfo) => {
-          const name = assetInfo.name
-          if (name && name.startsWith('demos/')) {
-            return `assets/${name}/[name]-[hash][extname]`
+          if (assetInfo.fileName && assetInfo.fileName.includes('demos/')) {
+            const demoName = assetInfo.fileName.match(/demos\/([^/]+)/)[1]
+            return `assets/demos/${demoName}/${demoName}-[hash][extname]`
           }
-          return 'assets/[name]-[hash][extname]'
+          return 'assets/main/main-[hash][extname]'
         }
       }
     }

@@ -40,8 +40,28 @@ defmodule ScorpiusSonnetWeb.Router do
   scope "/demos", ScorpiusSonnetWeb.Demos do
     pipe_through [:browser, :demos]
 
-    get "/", DemoController, :index
-    get "/:demo_id", DemoController, :show
+    get "/", DemoIndexController, :index
+  end
+
+  # Christmas Demo 路由
+  scope "/demos/christmas", ScorpiusSonnetWeb.Demos.Christmas do
+    pipe_through [:browser, :demos]
+
+    get "/", PageController, :index
+  end
+
+  # Counter Demo 路由
+  scope "/demos/counter", ScorpiusSonnetWeb.Demos.Counter do
+    pipe_through [:browser, :demos]
+
+    get "/", PageController, :index
+  end
+
+  # React Demo 路由
+  scope "/demos/react-demo", ScorpiusSonnetWeb.Demos.ReactDemo do
+    pipe_through [:browser, :demos]
+
+    get "/", PageController, :index
   end
 
   # Other scopes may use custom stacks.

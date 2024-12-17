@@ -13,9 +13,14 @@
     "phoenix": "file:../deps/phoenix",
     "phoenix_html": "file:../deps/phoenix_html",
     "phoenix_live_view": "file:../deps/phoenix_live_view",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "vue": "^3.4.15"
   },
   "devDependencies": {
+    "@types/react": "^18.3.17",
+    "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react": "^4.3.4",
     "@vitejs/plugin-vue": "^5.0.3",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.49",

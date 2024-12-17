@@ -1,7 +1,10 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import react from '@vitejs/plugin-react'
 import path from 'path'
 import fs from 'fs'
+import tailwindcss from 'tailwindcss'
+import autoprefixer from 'autoprefixer'
 
 function getDemoEntries() {
   const demoDir = path.resolve(__dirname, 'demos')
@@ -13,9 +16,13 @@ function getDemoEntries() {
       .map(dirent => dirent.name)
 
     demos.forEach(demo => {
-      const entryPath = path.resolve(demoDir, demo, 'main.js')
-      if (fs.existsSync(entryPath)) {
-        entries[`demos/${demo}`] = entryPath
+      const jsxPath = path.resolve(demoDir, demo, 'main.jsx')
+      const jsPath = path.resolve(demoDir, demo, 'main.js')
+      
+      if (fs.existsSync(jsxPath)) {
+        entries[`demos/${demo}`] = jsxPath
+      } else if (fs.existsSync(jsPath)) {
+        entries[`demos/${demo}`] = jsPath
       }
     })
   }
@@ -24,7 +31,29 @@ function getDemoEntries() {
 }
 
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [
+    react(),
+    vue()
+  ],
+  resolve: {
+    extensions: ['.mjs', '.js', '.jsx', '.json', '.vue']
+  },
+  optimizeDeps: {
+    include: ['react', 'react-dom']
+  },
+  esbuild: {
+    loader: 'jsx',
+    include: /.*\.jsx$/,
+    exclude: [],
+  },
+  css: {
+    postcss: {
+      plugins: [
+        tailwindcss(),
+        autoprefixer()
+      ]
+    }
+  },
   build: {
     target: 'esnext',
     outDir: '../priv/static/demos',
