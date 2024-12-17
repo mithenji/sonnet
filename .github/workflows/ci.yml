@@ -19,6 +19,15 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
 
+      - uses: erlef/setup-beam@5304e04ea2b355f03681464e683d92e3b2f18451 # v1
+        id: beam
+        with:
+          version-file: .tool-versions
+          version-type: strict
+
+      - name: Install mix dependencies
+        run: mix deps.get
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -33,12 +42,6 @@ jobs:
           npm run build
           npm run build:demos
 
-      - uses: erlef/setup-beam@5304e04ea2b355f03681464e683d92e3b2f18451 # v1
-        id: beam
-        with:
-          version-file: .tool-versions
-          version-type: strict
-
       - name: Restore the deps and _build cache
         uses: actions/cache@6849a6489940f00c2f30c0fb92c6274307ccb58a # v4
         id: restore-cache
@@ -51,10 +54,6 @@ jobs:
             deps
             _build
           key: ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-mixlockhash-${{ env.MIX_LOCK_HASH }}
-
-      - name: Install mix dependencies
-        if: steps.restore-cache.outputs.cache-hit != 'true'
-        run: mix deps.get
 
       - name: Compile dependencies
         if: steps.restore-cache.outputs.cache-hit != 'true'
