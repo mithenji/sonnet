@@ -7,8 +7,11 @@
 # General application configuration
 import Config
 
+# 注释掉 Ecto repo 配置
+# config :scorpius_sonnet,
+#   ecto_repos: [ScorpiusSonnet.Repo]
+
 config :scorpius_sonnet,
-  ecto_repos: [ScorpiusSonnet.Repo],
   generators: [timestamp_type: :utc_datetime]
 
 # Configures the endpoint
