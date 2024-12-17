@@ -88,7 +88,7 @@ ENV PHX_HOST=${PHX_HOST}
 ENV SECRET_KEY_BASE=${SECRET_KEY_BASE}
 
 # Only copy the final release from the build stage
-COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/website ./
+COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/scorpius_sonnet ./
 
 USER nobody
 
