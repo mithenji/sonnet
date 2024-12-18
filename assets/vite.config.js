@@ -33,9 +33,7 @@ function getDemoEntries() {
 
 export default defineConfig({
   plugins: [
-    react({
-      jsxRuntime: 'automatic',
-    }),
+    react(),
     vue()
   ],
   css: {

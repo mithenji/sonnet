@@ -10,9 +10,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "fullpage.js": "^4.0.31",
     "phoenix": "file:../deps/phoenix",
     "phoenix_html": "file:../deps/phoenix_html",
     "phoenix_live_view": "file:../deps/phoenix_live_view",
+    "pixi.js": "^8.6.5",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "vue": "^3.4.15"
@@ -25,6 +27,6 @@
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.16",
-    "vite": "^5.0.12"
+    "vite": "^6.0.3"
   }
 }

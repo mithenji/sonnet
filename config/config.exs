@@ -23,7 +23,8 @@ config :scorpius_sonnet, ScorpiusSonnetWeb.Endpoint,
     layout: false
   ],
   pubsub_server: ScorpiusSonnet.PubSub,
-  live_view: [signing_salt: "AXze0S27"]
+  live_view: [signing_salt: "AXze0S27"],
+  layout: false
 
 # Configures the mailer
 #
