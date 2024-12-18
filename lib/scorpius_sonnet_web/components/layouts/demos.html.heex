@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="csrf-token" content={get_csrf_token()} />
     <title>演示项目</title>
-    <%= raw(VitePhx.vite_client()) %>
   </head>
   <body>
     <nav class="bg-gray-800 text-white p-4">
@@ -13,7 +12,6 @@
         <.link navigate={~p"/demos"} class="text-xl font-bold">演示项目</.link>
       </div>
     </nav>
-
     <%= @inner_content %>
   </body>
 </html>

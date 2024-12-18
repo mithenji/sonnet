@@ -3,6 +3,13 @@
 @import "tailwindcss/utilities";
 
 /* Christmas Meta specific styles */
+#container-christmas-meta {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
 .christmas-meta-demo {
   min-height: 100vh;
   background: linear-gradient(to bottom, #1a365d, #2d3748);
@@ -10,10 +17,7 @@
   overflow: hidden;
 }
 
-.scene-container {
-  perspective: 1000px;
-  height: 70vh;
-}
+/* .scene-container {} */
 
 .christmas-scene {
   position: relative;
@@ -119,4 +123,179 @@
     opacity: 0.5;
     transform: scale(0.8);
   }
-} 
+}
+
+.christmas-swiper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+}
+
+.swiper-slide {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.video-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.christmas-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 操作区域容器 */
+.operating-container {
+  position: absolute;
+  bottom: 100px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.operating-item {
+  display: flex;
+  gap: 1rem;
+}
+
+/* 按钮样式 */
+.operating-item-button {
+  position: relative;
+  padding: 0.25rem 1.5rem;
+  border: 1px solid #FFD700;
+  background-color: rgba(255, 255, 224, 0.2);
+  border-radius: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.operating-item-button:hover {
+  background-color: rgba(255, 255, 224, 0.3);
+}
+
+.operating-item-button:active {
+  transform: scale(0.95);
+  background-color: rgba(255, 255, 224, 0.4);
+}
+
+.operating-item-button:focus {
+  outline: none;
+}
+
+/* 按钮文字 */
+.operating-item-button-text {
+  position: relative;
+  z-index: 10;
+  color: white;
+  font-size: 14px;
+}
+
+/* 渐变动画效果 */
+.button-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, 
+    rgba(255, 215, 0, 0.2),
+    rgba(255, 165, 0, 0.2)
+  );
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+
+.operating-item-button:hover .button-gradient {
+  transform: scaleX(1);
+}
+
+/* 头部容器 */
+.header-container {
+  width: 100%;
+  padding: 0 2rem;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-item {
+  display: flex;
+  gap: 1rem;
+}
+
+/* 控制器容器 */
+.controller-container {
+  width: 100%;
+  padding: 0 1rem;
+  position: absolute;
+  top: 44px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.controller-item {
+  display: flex;
+  gap: 1rem;
+}
+
+/* 控制器按钮样式 */
+.controller-item-button {
+  position: relative;
+  padding: 0.25rem 1.5rem;
+  border: 1px solid #FFD700;
+  background-color: rgba(255, 255, 224, 0.2);
+  border-radius: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.controller-item-button:hover {
+  background-color: rgba(255, 255, 224, 0.3);
+}
+
+.controller-item-button:active {
+  transform: scale(0.95);
+  background-color: rgba(255, 255, 224, 0.4);
+}
+
+.controller-item-button:focus {
+  outline: none;
+}
+
+/* 控制器按钮文字 */
+.controller-item-button-text {
+  position: relative;
+  z-index: 10;
+  color: white;
+  font-size: 14px;
+}
+
+/* 控制器按钮也使用相同的渐变动画效果 */
+.controller-item-button:hover .button-gradient {
+  transform: scaleX(1);
+}
+
+/* 复用 operating-item-button 的样式，所以不需要额外的按钮样式 */
+  

@@ -69,11 +69,18 @@ export default defineConfig({
           return 'assets/main/chunks/main-[hash].js'
         },
         assetFileNames: (assetInfo) => {
-          if (assetInfo.fileName && assetInfo.fileName.includes('demos/')) {
-            const demoName = assetInfo.fileName.match(/demos\/([^/]+)/)[1]
-            return `assets/demos/${demoName}/${demoName}-[hash][extname]`
+          const info = assetInfo.name.split('.')
+          const ext = info[info.length - 1]
+          if (/\.(mp4|webm|ogg)$/.test(assetInfo.name)) {
+            return `static/videos/[name]-[hash][extname]`
           }
-          return 'assets/main/main-[hash][extname]'
+          if (/\.(png|jpe?g|gif|svg|webp|avif)$/.test(assetInfo.name)) {
+            return `static/images/[name]-[hash][extname]`
+          }
+          if (/\.(woff2?|eot|ttf|otf)$/.test(assetInfo.name)) {
+            return `static/fonts/[name]-[hash][extname]`
+          }
+          return `static/assets/[name]-[hash][extname]`
         }
       }
     }

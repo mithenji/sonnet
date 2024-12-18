@@ -21,6 +21,12 @@ defmodule ScorpiusSonnetWeb.Router do
     plug :put_root_layout, {ScorpiusSonnetWeb.Layouts, :demos}
   end
 
+  pipeline :put_demo_layouts do
+    plug :put_root_layout, html: {ScorpiusSonnetWeb.Layouts, :root}
+    plug :put_layout, html: {ScorpiusSonnetWeb.Demos.ChristmasMeta.PageHTML, :app}
+    plug :assign_demo_layout
+  end
+
   # 主应用路由
   scope "/", ScorpiusSonnetWeb do
     pipe_through [:browser]
@@ -37,11 +43,12 @@ defmodule ScorpiusSonnetWeb.Router do
 
   # Demos 路由
   scope "/demos", ScorpiusSonnetWeb.Demos do
-    pipe_through [:browser, :demos]
+    pipe_through :browser
 
     get "/", DemoIndexController, :index
 
     scope "/christmas-meta" do
+      pipe_through [:put_demo_layouts]
       get "/", ChristmasMeta.PageController, :index
     end
 
@@ -68,5 +75,9 @@ defmodule ScorpiusSonnetWeb.Router do
       live_dashboard "/dashboard", metrics: ScorpiusSonnetWeb.Telemetry
       forward "/mailbox", Plug.Swoosh.MailboxPreview
     end
+  end
+
+  def assign_demo_layout(conn, _opts) do
+    assign(conn, :skip_app_js, true)
   end
 end

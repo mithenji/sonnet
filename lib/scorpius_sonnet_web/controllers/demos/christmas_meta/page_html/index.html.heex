@@ -1,2 +1,82 @@
-<div id="demo-christmas-meta"></div>
+<div id="container-christmas-meta">
+  <div class="video-container">
+    <video
+      class="christmas-video"
+      autoplay
+      loop
+      muted
+      playsinline
+      src={VitePhx.asset_path("static/videos/Christmas.MOV")}
+    >
+    </video>
+  </div>
+  <!-- Slider main container -->
+  <div class="christmas-swiper">
+    <!-- Additional required wrapper -->
+    <div class="swiper-wrapper">
+      <!-- Slides -->
+      <div class="swiper-slide">
+        <%!-- Slide 1 --%>
+        <div class="operating-container absolute bottom-[80px] left-0 right-0 flex justify-center items-center">
+          <div class="operating-item">
+            <button class="operating-item-button" id="bullet-comment">
+              <span class="operating-item-button-text">
+                弹幕留言
+              </span>
+              <span class="button-gradient"></span>
+            </button>
+            <button class="operating-item-button" id="register-user">
+              <span class="operating-item-button-text">
+                登记用户信息
+              </span>
+              <span class="button-gradient"></span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="swiper-slide">
+        <%!-- Slide 2 --%>
+        <div class="controller-container absolute top-0 left-0 right-0 flex justify-center items-center">
+          <div class="controller-item">
+            <button class="controller-item-button back-index">
+              <span class="controller-item-button-text">
+                返回首页
+              </span>
+              <span class="button-gradient"></span>
+            </button>
+          </div>
+          <div class="controller-item">
+            <%!-- <button class="controller-item-button" id="bullet-list">
+              <span class="controller-item-button-text">
+                弹幕列表
+              </span>
+              <span class="button-gradient"></span>
+            </button> --%>
+          </div>
+        </div>
+      </div>
+      <div class="swiper-slide">
+        <%!-- Slide 3 --%>
+        <div class="controller-container absolute top-0 left-0 right-0 flex justify-center items-center">
+          <div class="controller-item">
+            <button class="controller-item-button back-index">
+              <span class="controller-item-button-text">
+                返回首页
+              </span>
+              <span class="button-gradient"></span>
+            </button>
+          </div>
+          <div class="controller-item">
+            <%!-- <button class="controller-item-button" id="bullet-list">
+              <span class="controller-item-button-text">
+                弹幕列表
+              </span>
+              <span class="button-gradient"></span>
+            </button> --%>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 <script type="module" src={VitePhx.asset_path("demos/christmas-meta/main.js")}></script> 
