@@ -17,10 +17,11 @@ defmodule ScorpiusSonnet.Application do
       require Logger
       Logger.info("Starting Vite development server...")
 
-      port = Port.open(
-        {:spawn, "cd assets && npm run dev"},
-        [:binary, :exit_status, :stderr_to_stdout]
-      )
+      port =
+        Port.open(
+          {:spawn, "cd assets && npm run dev"},
+          [:binary, :exit_status, :stderr_to_stdout]
+        )
 
       Logger.info("Vite server started with port: #{inspect(port)}")
     end

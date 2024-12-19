@@ -8,8 +8,10 @@
       <%= assigns[:page_title] || "ScorpiusSonnet" %>
     </.live_title>
     <%= if !assigns[:skip_app_js] do %>
-      <script type="module" src="http://localhost:5175/@vite/client"></script>
-      <script type="module" src="http://localhost:5175/main/app.js"></script>
+      <script type="module" src="http://localhost:5175/@vite/client">
+      </script>
+      <script type="module" src="http://localhost:5175/main/app.js">
+      </script>
     <% end %>
   </head>
   <body class="bg-white antialiased">
