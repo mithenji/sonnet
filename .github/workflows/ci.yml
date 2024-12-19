@@ -40,7 +40,6 @@ jobs:
         run: |
           npm ci
           npm run build
-          npm run build:demos
 
       - name: Restore the deps and _build cache
         uses: actions/cache@6849a6489940f00c2f30c0fb92c6274307ccb58a # v4

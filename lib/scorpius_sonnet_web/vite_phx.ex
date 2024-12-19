@@ -5,7 +5,7 @@ defmodule VitePhx do
 
   def asset_path(entry) do
     if Mix.env() == :dev do
-      "http://localhost:5175/#{entry}"
+      "http://0.0.0.0:5175/#{entry}"
     else
       # 在生产环境中，资源文件会被编译到 priv/static 目录
       "/#{entry}"
@@ -14,7 +14,7 @@ defmodule VitePhx do
 
   def vite_client do
     if Mix.env() == :dev do
-      ~s(<script type="module" src="http://localhost:5175/@vite/client"></script>)
+      ~s(<script type="module" src="http://0.0.0.0:5175/@vite/client"></script>)
     end
   end
 end

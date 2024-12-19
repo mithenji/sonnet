@@ -45,13 +45,23 @@
               <span class="button-gradient"></span>
             </button>
           </div>
-          <div class="controller-item">
-            <%!-- <button class="controller-item-button" id="bullet-list">
-              <span class="controller-item-button-text">
-                弹幕列表
-              </span>
-              <span class="button-gradient"></span>
-            </button> --%>
+          <div class="controller-item"></div>
+        </div>
+        <div class="danmu-container h-screen flex flex-col justify-between items-center">
+          <div class="scene-container w-full h-[300px]">
+            <div class="screen w-full h-full"></div>
+          </div>
+          <div class="emitter-container w-full h-[150px] flex flex-col justify-center items-center p-0 relative">
+            <div class="emitter-input-textarea w-full h-full p-[10px] pl-[15px]">
+                <textarea class="w-full h-full border border-[#FFD700] rounded-[4px] bg-transparent focus:border-[#FFEA00] hover:border-[#FFEA00] active:border-[#FFEA00] focus:outline-none focus:ring-0 caret-[#FFEA00] p-[10px] pl-[15px]" id="danmuInput"></textarea>
+            </div>
+            <div class="emitter-input-container">
+              <button class="emitter-input-button" id="sendDanmu">
+                <span class="emitter-input-button-text">
+                  发送
+                </span>
+              </button>
+            </div>
           </div>
         </div>
       </div>

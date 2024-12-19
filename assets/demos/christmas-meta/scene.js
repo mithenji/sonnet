@@ -4,6 +4,8 @@ import { EffectFade } from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/effect-fade'
 
+import { ComponentBullet } from './componentBullet'
+
 export class ChristmasScene {
   constructor(selector) {
     this.container = document.querySelector(selector)
@@ -28,6 +30,8 @@ export class ChristmasScene {
     this.setupResizeListener()
     // 初始化按钮事件
     this.initButtonEvents()
+    // 初始化弹幕组件
+    this.initBullet() 
   }
 
   setupContainer() {
@@ -65,7 +69,7 @@ export class ChristmasScene {
 
     this.resizeObserver.observe(this.container)
 
-    // 监��窗口大小变化
+    // 监听窗口大小变化
     window.addEventListener('resize', () => {
       this.updateContainerSize()
     })
@@ -144,9 +148,31 @@ export class ChristmasScene {
           // 只在首页启用触摸
           swiper.allowTouchMove = swiper.activeIndex === 0
         },
-        slideChange: function(swiper) {
+        slideChange: (swiper) => {
           // 动态设置触摸响应
           swiper.allowTouchMove = swiper.activeIndex === 0
+          
+          // 当滑动到第二页时（index === 1）
+          if (swiper.activeIndex === 1) {
+            console.log('swiper.activeIndex === 1', this.bullet, swiper.activeIndex)
+            if (!this.bullet) {
+              this.initBullet();
+              window.setTimeout(() => {
+                this.bullet.sendAction();
+                this.bullet.emitDanmu('欢迎来到弹幕页面！');
+              }, 100);
+            } else {
+              this.bullet.sendAction();
+              this.bullet.emitDanmu('欢迎来到弹幕页面！');
+            }
+          } else {
+            // 离开弹幕页面时
+            if (this.bullet) {
+              this.bullet.pauseBullet();
+              this.bullet.destroy();
+              this.bullet = null;
+            }
+          }
         }
       }
     })
@@ -165,5 +191,11 @@ export class ChristmasScene {
     if (this.swiper && this.swiper.activeIndex !== 0) {
       event.stopPropagation()
     }
+  }
+  
+
+  initBullet() {
+    this.bullet = new ComponentBullet('.screen')
+    this.bullet.init()
   }
 } 

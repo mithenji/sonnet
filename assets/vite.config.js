@@ -55,14 +55,14 @@ export default defineConfig({
       },
       output: {
         entryFileNames: (chunkInfo) => {
-          if (chunkInfo.facadeModuleId.includes('demos/')) {
+          if (chunkInfo.facadeModuleId && chunkInfo.facadeModuleId.includes('demos/')) {
             const demoName = chunkInfo.facadeModuleId.match(/demos\/([^/]+)/)[1]
             return `assets/demos/${demoName}/${demoName}-[hash].js`
           }
           return 'assets/main/main-[hash].js'
         },
         chunkFileNames: (chunkInfo) => {
-          if (chunkInfo.facadeModuleId.includes('demos/')) {
+          if (chunkInfo.facadeModuleId && chunkInfo.facadeModuleId.includes('demos/')) {
             const demoName = chunkInfo.facadeModuleId.match(/demos\/([^/]+)/)[1]
             return `assets/demos/${demoName}/chunks/${demoName}-[hash].js`
           }
@@ -86,11 +86,11 @@ export default defineConfig({
     }
   },
   server: {
-    origin: 'http://localhost:5175',
+    origin: 'http://0.0.0.0:5175',
     strictPort: true,
     port: 5175,
     hmr: {
-      host: 'localhost',
+      host: '0.0.0.0',
       protocol: 'ws',
       timeout: 30000,
       overlay: true,

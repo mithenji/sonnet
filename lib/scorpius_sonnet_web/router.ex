@@ -77,6 +77,13 @@ defmodule ScorpiusSonnetWeb.Router do
     end
   end
 
+  scope "/json", ScorpiusSonnetWeb do
+    pipe_through :api
+
+    get "/version", VersionController, :index
+    get "/list", VersionController, :list
+  end
+
   def assign_demo_layout(conn, _opts) do
     assign(conn, :skip_app_js, true)
   end
