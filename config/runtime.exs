@@ -63,6 +63,10 @@ if config_env() == :prod do
       ip: {0, 0, 0, 0, 0, 0, 0, 0},
       port: port
     ],
+    check_origin: [
+      "https://sonnet.mithenji.me",
+      "http://localhost:4080"
+    ],
     secret_key_base: secret_key_base
 
   # ## SSL Support
