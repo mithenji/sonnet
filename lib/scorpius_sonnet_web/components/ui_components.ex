@@ -1,4 +1,9 @@
 defmodule ScorpiusSonnetWeb.Components.UIComponents do
+  @moduledoc """
+  提供通用 UI 组件的模块，用于构建 web 界面。
+  包含了可重用的界面元素和组件。
+  """
+
   use Phoenix.Component
 
   @doc """

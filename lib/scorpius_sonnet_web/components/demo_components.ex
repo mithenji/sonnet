@@ -1,4 +1,9 @@
 defmodule ScorpiusSonnetWeb.DemoComponents do
+  @moduledoc """
+  演示组件模块，用于展示和测试目的。
+  包含了各种示例和演示用的组件实现。
+  """
+
   use Phoenix.Component
 
   attr :title, :string, required: true
