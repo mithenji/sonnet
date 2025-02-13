@@ -51,9 +51,11 @@ COPY lib lib
 
 COPY assets assets
 
+# 安装前端依赖并构建
 RUN npm install --prefix ./assets
+RUN npm run build --prefix ./assets
 
-# compile assets
+# 编译 Phoenix 资源
 RUN mix assets.deploy
 
 # Compile the release
