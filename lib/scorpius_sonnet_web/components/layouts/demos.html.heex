@@ -4,14 +4,28 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="csrf-token" content={get_csrf_token()} />
-    <title>演示项目</title>
+    <.live_title suffix=" · 演示项目">
+      <%= assigns[:page_title] || "Scorpius Sonnet" %>
+    </.live_title>
+    <link rel="stylesheet" href={~p"/assets/app.css"} />
   </head>
-  <body>
+  <body class="bg-gray-50">
     <nav class="bg-gray-800 text-white p-4">
-      <div class="container mx-auto">
+      <div class="container mx-auto flex justify-between items-center">
         <.link navigate={~p"/demos"} class="text-xl font-bold">演示项目</.link>
+        <div class="flex gap-4">
+          <.link navigate={~p"/demos"} class="hover:text-gray-300">项目列表</.link>
+          <.link navigate={~p"/demos/about"} class="hover:text-gray-300">关于</.link>
+        </div>
       </div>
     </nav>
-    <%= @inner_content %>
+    
+    <main class="container mx-auto py-8">
+      <.flash_group flash={@flash} />
+      <%= @inner_content %>
+    </main>
+    
+    <script defer type="text/javascript" src={~p"/assets/app.js"}>
+    </script>
   </body>
 </html>

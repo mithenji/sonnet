@@ -1,6 +1,5 @@
 import { createApp } from 'vue'
 import App from './App.vue'
-import './styles/index.css'
+import '../styles/base.css'  // 使用共享样式
 
-const app = createApp(App)
-app.mount('#demo-counter')
+createApp(App).mount('#demo-counter')

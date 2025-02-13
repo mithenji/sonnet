@@ -1,0 +1,33 @@
+<div class="container mx-auto px-4 py-8">
+  <%!-- 添加导航 --%>
+  <div class="flex items-center justify-between mb-8">
+    <h1 class="text-3xl font-bold">关于演示项目</h1>
+    <nav class="flex gap-4">
+      <.link navigate={~p"/demos"} class="text-gray-600 hover:text-gray-500">
+        首页
+      </.link>
+      <.link navigate={~p"/demos/about"} class="text-indigo-600 hover:text-indigo-500">
+        关于
+      </.link>
+    </nav>
+  </div>
+
+  <div class="prose lg:prose-xl max-w-none">
+    <p class="text-gray-600 mb-6">
+      这是一个展示各种前端技术的演示项目集合。我们的目标是帮助开发者了解如何在 Phoenix 框架中集成和使用现代前端技术。
+    </p>
+
+    <h2 class="text-2xl font-semibold mb-4">技术栈</h2>
+    <ul class="space-y-2 text-gray-600">
+      <li>Phoenix Framework - 基础框架</li>
+      <li>React - 用于构建交互式 UI</li>
+      <li>TailwindCSS - 样式解决方案</li>
+      <li>Canvas API - 用于图形渲染</li>
+    </ul>
+
+    <h2 class="text-2xl font-semibold mt-8 mb-4">如何使用</h2>
+    <p class="text-gray-600">
+      每个演示项目都是独立的，你可以单独查看和学习。代码都托管在 GitHub 上，欢迎参考和贡献。
+    </p>
+  </div>
+</div> 

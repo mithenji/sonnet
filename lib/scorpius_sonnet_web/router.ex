@@ -5,6 +5,7 @@ defmodule ScorpiusSonnetWeb.Router do
     plug :accepts, ["html"]
     plug :fetch_session
     plug :fetch_live_flash
+    plug :put_root_layout, html: {ScorpiusSonnetWeb.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
   end
@@ -13,31 +14,25 @@ defmodule ScorpiusSonnetWeb.Router do
     plug :accepts, ["json"]
   end
 
-  pipeline :admin do
-    plug :put_root_layout, html: {ScorpiusSonnetWeb.Layouts, :admin}
+  # 简化布局 pipeline
+  pipeline :with_admin_layout do
+    plug :put_layout, html: {ScorpiusSonnetWeb.Layouts, :admin}
   end
 
-  pipeline :demos do
-    plug :put_root_layout, {ScorpiusSonnetWeb.Layouts, :demos}
-  end
-
-  pipeline :put_demo_layouts do
-    plug :put_root_layout, html: {ScorpiusSonnetWeb.Layouts, :root}
-    plug :put_layout, html: {ScorpiusSonnetWeb.Demos.ChristmasMeta.PageHTML, :app}
-    plug :assign_demo_layout
+  pipeline :with_demos_layout do
+    plug :put_layout, html: {ScorpiusSonnetWeb.Layouts, :demos}
   end
 
   # 主应用路由
   scope "/", ScorpiusSonnetWeb do
-    pipe_through [:browser]
+    pipe_through :browser
 
     get "/", PageController, :home
   end
 
   # Admin 路由
   scope "/admin", ScorpiusSonnetWeb.Admin do
-    pipe_through [:browser, :admin]
-
+    pipe_through [:browser, :with_admin_layout]
     get "/", DashboardController, :index
   end
 
@@ -45,24 +40,22 @@ defmodule ScorpiusSonnetWeb.Router do
   scope "/demos", ScorpiusSonnetWeb.Demos do
     pipe_through :browser
 
-    get "/", DemoIndexController, :index
+    get "/", DemoController, :index
+    get "/about", DemoController, :about
 
-    scope "/christmas-meta" do
-      pipe_through [:put_demo_layouts]
-      get "/", ChristmasMeta.PageController, :index
-    end
+    # Demo 项目
+    get "/christmas", Christmas.PageController, :index
+    get "/christmas-meta", ChristmasMeta.PageController, :index
+    get "/counter", Counter.PageController, :index
+    get "/react-demo", ReactDemo.PageController, :index
+  end
 
-    scope "/christmas", Christmas do
-      get "/", PageController, :index
-    end
+  # API 路由
+  scope "/api", ScorpiusSonnetWeb.API do
+    pipe_through :api
 
-    scope "/counter", Counter do
-      get "/", PageController, :index
-    end
-
-    scope "/react-demo", ReactDemo do
-      get "/", PageController, :index
-    end
+    get "/version", VersionController, :show
+    resources "/demos", DemoController, only: [:index, :show]
   end
 
   # Enable LiveDashboard in development
@@ -75,16 +68,5 @@ defmodule ScorpiusSonnetWeb.Router do
       live_dashboard "/dashboard", metrics: ScorpiusSonnetWeb.Telemetry
       forward "/mailbox", Plug.Swoosh.MailboxPreview
     end
-  end
-
-  scope "/json", ScorpiusSonnetWeb do
-    pipe_through :api
-
-    get "/version", VersionController, :index
-    get "/list", VersionController, :list
-  end
-
-  def assign_demo_layout(conn, _opts) do
-    assign(conn, :skip_app_js, true)
   end
 end

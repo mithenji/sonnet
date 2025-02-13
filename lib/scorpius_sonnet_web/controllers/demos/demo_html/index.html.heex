@@ -1,0 +1,44 @@
+<UIComponents.page_container>
+  <div class="flex items-center justify-between mb-8">
+    <h1 class="text-3xl font-bold">演示项目列表</h1>
+    <UIComponents.nav_bar
+      items={[
+        %{path: ~p"/demos", text: "首页"},
+        %{path: ~p"/demos/about", text: "关于"}
+      ]}
+      current_path={~p"/demos"}
+    />
+  </div>
+  
+  <div class="prose max-w-none mb-8">
+    <p class="text-gray-600">
+      这里展示了一系列使用不同前端技术构建的演示项目，帮助你了解如何在 Phoenix 中集成现代前端框架。
+    </p>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <UIComponents.demo_card
+      title="圣诞演示"
+      description="使用 Vue 3 构建的圣诞主题动画"
+      path={~p"/demos/christmas"}
+    />
+
+    <UIComponents.demo_card
+      title="计数器"
+      description="Vue 3 实现的简单计数器"
+      path={~p"/demos/counter"}
+    />
+
+    <UIComponents.demo_card
+      title="React 演示"
+      description="React 18 示例项目"
+      path={~p"/demos/react-demo"}
+    />
+
+    <UIComponents.demo_card
+      title="圣诞元宇宙"
+      description="3D 圣诞主题场景与动画效果"
+      path={~p"/demos/christmas-meta"}
+    />
+  </div>
+</UIComponents.page_container> 

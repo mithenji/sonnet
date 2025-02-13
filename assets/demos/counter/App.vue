@@ -1,10 +1,12 @@
 <template>
-  <div class="counter-demo">
-    <h1>Counter Demo</h1>
-    <div class="counter">
-      <button @click="count--">-</button>
-      <span>{{ count }}</span>
-      <button @click="count++">+</button>
+  <div class="demo-container">
+    <h1 class="text-2xl font-bold mb-8">Counter Demo</h1>
+    <div class="demo-card">
+      <div class="flex justify-center items-center gap-4">
+        <button class="demo-button" @click="count--">-</button>
+        <span class="text-2xl">{{ count }}</span>
+        <button class="demo-button" @click="count++">+</button>
+      </div>
     </div>
   </div>
 </template>

@@ -98,3 +98,6 @@ config :phoenix_live_view,
 
 # Disable swoosh api client as it is only required for production adapters.
 config :swoosh, :api_client, false
+
+# 建议添加开发环境特定配置
+config :scorpius_sonnet, :environment, :dev

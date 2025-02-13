@@ -1,5 +1,5 @@
 <template>
-  <div class="christmas-demo">
+  <div class="demo-container christmas-demo">
     <h1 class="text-2xl font-bold text-center my-4">Christmas Demo</h1>
     <div class="flex justify-center">
       <div class="christmas-tree text-center">
@@ -18,8 +18,6 @@
 
 <style scoped>
 .christmas-demo {
-  min-height: 100vh;
-  padding: 2rem;
   background: linear-gradient(to bottom, #ffffff, #f0f0f0);
 }
 
