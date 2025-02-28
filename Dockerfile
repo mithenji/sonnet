@@ -51,6 +51,8 @@ COPY lib lib
 
 COPY assets assets
 
+COPY assets/static priv/static/
+
 # 安装前端依赖并构建
 RUN npm install --prefix ./assets
 RUN npm run build --prefix ./assets
