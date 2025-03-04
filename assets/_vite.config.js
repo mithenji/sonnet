@@ -1,19 +1,18 @@
-import fs from 'fs'
-import path from 'path'
 import { defineConfig } from 'vite'
-import Inspect from 'vite-plugin-inspect'
-import react from "@vitejs/plugin-react-swc";
+import react from '@vitejs/plugin-react'
 import vue from '@vitejs/plugin-vue'
+import path from 'path'
+import fs from 'fs'
 import tailwindcss from 'tailwindcss'
 import autoprefixer from 'autoprefixer'
 
 // 自动扫描指定目录获取所有入口
 function getEntries(directories = ['demos']) {
   const entries = {}
-  
+
   directories.forEach(dir => {
     const fullPath = path.resolve(__dirname, dir)
-    
+
     if (fs.existsSync(fullPath)) {
       const subDirs = fs.readdirSync(fullPath, { withFileTypes: true })
         .filter(dirent => dirent.isDirectory())
@@ -22,7 +21,7 @@ function getEntries(directories = ['demos']) {
       subDirs.forEach(subDir => {
         const jsxPath = path.resolve(fullPath, subDir, 'main.jsx')
         const jsPath = path.resolve(fullPath, subDir, 'main.js')
-        
+
         if (fs.existsSync(jsxPath)) {
           entries[`${dir}/${subDir}`] = jsxPath
         } else if (fs.existsSync(jsPath)) {
@@ -41,15 +40,15 @@ const scanDirectories = ['demos', 'main']
 // 创建一个映射表，用于在构建时识别文件所属的模块
 function createModuleMap() {
   const moduleMap = new Map()
-  
+
   scanDirectories.forEach(dir => {
     const fullPath = path.resolve(__dirname, dir)
-    
+
     if (fs.existsSync(fullPath)) {
       const subDirs = fs.readdirSync(fullPath, { withFileTypes: true })
         .filter(dirent => dirent.isDirectory())
         .map(dirent => dirent.name)
-        
+
       subDirs.forEach(subDir => {
         // 将模块路径添加到映射表中
         moduleMap.set(`${dir}/${subDir}`, {
@@ -59,7 +58,7 @@ function createModuleMap() {
       })
     }
   })
-  
+
   return moduleMap
 }
 
@@ -68,114 +67,49 @@ const moduleMap = createModuleMap()
 // 辅助函数：根据文件名或路径确定所属模块
 function getModuleInfo(filePath) {
   if (!filePath) return null
-  
+
   // 尝试从路径中匹配模块信息
   for (const [modulePath, info] of moduleMap.entries()) {
     if (filePath.includes(modulePath)) {
       return info
     }
   }
-  
+
   return null
 }
 
-function getManualChunks(id) {
-  // console.log('GetManualChunks', id)
-  // 使用 path.parse 解析模块路径
-  const parsed = path.parse(id);
-  const parts = id.split('node_modules/');
-  
-  // 如果不是 node_modules 中的模块，返回 undefined 让 Rollup 自行处理
-  if (parts.length < 2) {
-    return;
-  }
-
-  // 获取包名
-  const pkgPath = parts[parts.length - 1];
-  const pkgName = pkgPath.split('/')[0].replace(/^@/, ''); // 处理 @scope/package 的情况
-
-  // 更语义化的分组规则
-  const chunkGroups = {
-    // 框架核心库
-    'core-react': [
-      'react',
-      'react-dom',
-      'react-router',
-      'react-router-dom',
-      'react-is',
-      'scheduler',
-      'prop-types'
-    ],
-    'core-vue': [
-      'vue',
-      'vue-router',
-      'vuex',
-      'pinia',
-      '@vue',
-      '@vueuse'
-    ],
-    // UI 组件
-    'ui-components': [
-      'headlessui',
-      'heroicons',
-      '@headlessui',
-      '@heroicons',
-      'element-plus',
-      '@element-plus',
-      'ant-design',
-      '@ant-design'
-    ],
-    // 工具库
-    'libs-utils': [
-      'lodash',
-      'lodash-es',
-      'axios',
-      'dayjs',
-      'date-fns',
-      'moment'
-    ],
-    // 数据处理
-    'libs-data': [
-      'qs',
-      'uuid',
-      'json5',
-      'yaml'
-    ]
-  };
-
-  // 查找模块所属的分组
-  for (const [groupName, packages] of Object.entries(chunkGroups)) {
-    // 检查包名是否在分组列表中
-    if (packages.some(pkg => {
-      // 处理 @scope/package 的情况
-      if (pkg.startsWith('@')) {
-        return pkgPath.startsWith(pkg);
-      }
-      // 精确匹配包名
-      return pkgName === pkg || pkgPath.startsWith(`${pkg}/`);
-    })) {
-      return groupName;
+function getManualChunksName(id) {
+  // 更灵活的动态分组
+  if (id.includes('node_modules')) {
+    if (id.includes('react')) {
+      return 'vendor-react';
     }
-  }
-
-  // 小型包合并到共享块
-  try {
-    const stats = fs.statSync(id);
-    if (stats.size < 10 * 1024) {
-      return 'shared';
+    if (id.includes('vue')) {
+      return 'vendor-vue';
     }
-  } catch (e) {
-    // 忽略错误
+    if (id.includes('lodash') || id.includes('axios') || id.includes('dayjs')) {
+      return 'vendor-utils';
+    }
+    if (id.includes('headlessui') || id.includes('heroicons')) {
+      return 'vendor-ui';
+    }
+    // 其他 node_modules 模块
+    return 'vendor-others';
   }
-
-  // 其他第三方依赖
-  return `pkg-${pkgName}`;
 }
 
 export default defineConfig({
   plugins: [
-    Inspect(),
-    react(),
+    react({
+      // 确保 React 插件能够正确处理 JSX 文件
+      include: '**/*.{jsx,tsx}',
+      jsxRuntime: 'automatic',
+      babel: {
+        plugins: [
+          ['@babel/plugin-transform-react-jsx', { runtime: 'automatic' }]
+        ]
+      }
+    }),
     vue(),
     // 添加自定义插件，用于收集和处理模块信息
     {
@@ -215,31 +149,23 @@ export default defineConfig({
     rollupOptions: {
       input: {
         ...getEntries(scanDirectories),
+        'core-react': path.resolve(__dirname, '../core-react.js')
       },
       output: {
-        manualChunks: getManualChunks,
+        // manualChunks: getManualChunksName,
         chunkFileNames: (chunkInfo) => {
-          const name = chunkInfo.name;
-          if (!name) return 'assets/chunks/[hash].js';
-
-          // 使用更清晰的目录结构
-          if (name.startsWith('core-')) {
-            return `assets/core/${name}-[hash].js`;
-          }
-          if (name.startsWith('ui-')) {
-            return `assets/ui/${name}-[hash].js`;
-          }
-          if (name.startsWith('libs-')) {
-            return `assets/libs/${name}-[hash].js`;
-          }
-          if (name === 'shared') {
-            return 'assets/shared/index-[hash].js';
-          }
-          if (name.startsWith('pkg-')) {
-            return `assets/packages/${name.replace('pkg-', '')}/index-[hash].js`;
+          if (chunkInfo.name?.startsWith('vendor-')) {
+            return 'assets/vendor/[name]-[hash].js';
           }
 
-          // 动态导入的模块
+          if (chunkInfo.facadeModuleId) {
+            const moduleInfo = getModuleInfo(chunkInfo.facadeModuleId);
+            if (moduleInfo) {
+              const { dir, subDir } = moduleInfo;
+              return `${dir}/${subDir}/chunks/[name]-[hash].js`;
+            }
+          }
+
           return 'assets/chunks/[name]-[hash].js';
         },
         entryFileNames: (chunkInfo) => {
@@ -255,14 +181,14 @@ export default defineConfig({
         assetFileNames: (assetInfo) => {
           // 获取文件扩展名
           let extType = '';
-          
+
           // 简化日志输出，只记录关键信息
           console.log('处理资源:', {
             names: assetInfo.names,
             type: assetInfo.type,
             hasOriginalFileNames: !!assetInfo.originalFileNames?.length
           });
-          
+
           // 从文件名获取扩展名 - 优先使用标准属性
           if (assetInfo.names && assetInfo.names.length > 0) {
             const name = assetInfo.names[0];
@@ -271,11 +197,11 @@ export default defineConfig({
               extType = extMatch[1];
             }
           }
-          
+
           // 尝试识别资源所属的模块
           let moduleDir = '';
           let moduleSubDir = '';
-          
+
           // 从多种信息识别模块 - 优先使用originalFileNames
           const identifyModule = () => {
             // 1. 从originalFileNames识别 (Rollup 4.20.0+)
@@ -290,7 +216,7 @@ export default defineConfig({
                 }
               }
             }
-            
+
             // 2. 从moduleId识别 (兼容性方法)
             if (assetInfo.moduleId) {
               const moduleInfo = getModuleInfo(assetInfo.moduleId);
@@ -301,7 +227,7 @@ export default defineConfig({
                 return true;
               }
             }
-            
+
             // 3. 从names识别 (标准方法)
             if (assetInfo.names && assetInfo.names.length > 0) {
               for (const name of assetInfo.names) {
@@ -315,16 +241,16 @@ export default defineConfig({
                 }
               }
             }
-            
+
             return false;
           };
-          
+
           // 识别模块
           const moduleIdentified = identifyModule();
-          
+
           // 根据文件类型和模块信息构建输出路径
           // 使用标准占位符: [name], [hash], [ext], [extname]
-          
+
           // CSS 文件
           if (/css/.test(extType)) {
             if (moduleIdentified) {
@@ -332,7 +258,7 @@ export default defineConfig({
             }
             return 'assets/styles/[name]-[hash][extname]';
           }
-          
+
           // 媒体文件
           if (/mp4|webm|ogg/.test(extType)) {
             if (moduleIdentified) {
@@ -340,7 +266,7 @@ export default defineConfig({
             }
             return 'assets/media/[name]-[hash][extname]';
           }
-          
+
           // 图片文件
           if (/png|jpe?g|gif|svg|webp|avif/.test(extType)) {
             if (moduleIdentified) {
@@ -348,7 +274,7 @@ export default defineConfig({
             }
             return 'assets/images/[name]-[hash][extname]';
           }
-          
+
           // 字体文件
           if (/woff2?|eot|ttf|otf/.test(extType)) {
             if (moduleIdentified) {
@@ -356,12 +282,12 @@ export default defineConfig({
             }
             return 'assets/fonts/[name]-[hash][extname]';
           }
-          
+
           // 其他文件 - 使用标准占位符
           if (moduleIdentified) {
             return `${moduleDir}/${moduleSubDir}/assets/[name]-[hash][extname]`;
           }
-          
+
           // 默认输出路径 - 使用Rollup默认模式
           return 'assets/[name]-[hash][extname]';
         }
@@ -369,12 +295,15 @@ export default defineConfig({
     }
   },
   server: {
-    origin: 'http://127.0.0.1:5173',
-    cors: true,
+    origin: 'http://0.0.0.0:5175',
     strictPort: true,
-    port: 5173,
+    port: 5175,
     hmr: {
-      host: 'localhost',
+      host: '0.0.0.0',
+      protocol: 'ws',
+      timeout: 30000,
+      overlay: true,
+      clientPort: 5175
     },
     watch: {
       usePolling: true,

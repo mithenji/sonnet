@@ -1,0 +1,35 @@
+<.flash_group flash={@flash} />
+
+<div class="container mx-auto px-4 py-8">
+  <h1 class="text-3xl font-bold mb-8 text-center">演示项目列表</h1>
+  
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <.demo_card
+      title="计数器演示"
+      description="使用 Vue 3 构建的简单计数器应用"
+      path={~p"/demos/counter"}
+    />
+    
+    <.demo_card
+      title="React 演示"
+      description="使用 React 18 构建的示例应用"
+      path={~p"/demos/react-demo"}
+    />
+    
+    <.demo_card
+      title="圣诞节特效"
+      description="使用 Canvas 和 JavaScript 实现的圣诞节特效"
+      path={~p"/demos/christmas"}
+    />
+    
+    <.demo_card
+      title="圣诞节元数据"
+      description="圣诞节特效的元数据版本"
+      path={~p"/demos/christmas-meta"}
+    />
+  </div>
+  
+  <div class="mt-12 text-center">
+    <.secondary_button path={~p"/demos/about"} text="关于演示项目" />
+  </div>
+</div> 

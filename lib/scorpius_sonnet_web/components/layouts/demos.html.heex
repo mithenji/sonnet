@@ -7,7 +7,10 @@
     <.live_title suffix=" · 演示项目">
       <%= assigns[:page_title] || "Scorpius Sonnet" %>
     </.live_title>
-    <link rel="stylesheet" href={~p"/assets/app.css"} />
+    <%= raw(VitePhx.vite_client("demos")) %>
+    <link rel="stylesheet" href={VitePhx.css_path("demos/index")} />
+    <script type="module" src={VitePhx.asset_path("demos/index")}>
+    </script>
   </head>
   <body class="bg-gray-50">
     <nav class="bg-gray-800 text-white p-4">
@@ -24,8 +27,5 @@
       <.flash_group flash={@flash} />
       <%= @inner_content %>
     </main>
-
-    <script defer type="text/javascript" src={~p"/assets/app.js"}>
-    </script>
   </body>
 </html>

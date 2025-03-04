@@ -1,7 +1,5 @@
 <template>
-  <div id="app">
-    <!-- 主应用内容 -->
-  </div>
+  <!-- 主应用内容 -->
 </template>
 
 <script setup>

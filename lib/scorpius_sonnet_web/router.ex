@@ -20,14 +20,46 @@ defmodule ScorpiusSonnetWeb.Router do
   end
 
   pipeline :with_demos_layout do
-    plug :put_layout, html: {ScorpiusSonnetWeb.Layouts, :demos}
+    # 设置根布局为demos，避免使用默认的root布局
+    plug :put_root_layout, html: {ScorpiusSonnetWeb.Layouts, :demos}
+    # 设置子布局为app
+    plug :put_layout, html: {ScorpiusSonnetWeb.Layouts, :app}
+  end
+
+  # 为各个子项目创建独立的布局pipeline
+  pipeline :with_christmas_layout do
+    plug :put_root_layout, html: {ScorpiusSonnetWeb.Layouts, :christmas}
+  end
+
+  pipeline :with_christmas_meta_layout do
+    plug :put_root_layout, html: {ScorpiusSonnetWeb.Layouts, :christmas_meta}
+  end
+
+  pipeline :with_counter_layout do
+    plug :put_root_layout, html: {ScorpiusSonnetWeb.Layouts, :counter}
+  end
+
+  pipeline :with_react_demo_layout do
+    plug :put_root_layout, html: {ScorpiusSonnetWeb.Layouts, :react_demo}
+  end
+
+  pipeline :with_vue_demo_layout do
+    plug :put_root_layout, html: {ScorpiusSonnetWeb.Layouts, :vue_demo}
+  end
+
+  pipeline :with_svelte_demo_layout do
+    plug :put_root_layout, html: {ScorpiusSonnetWeb.Layouts, :svelte_demo}
+  end
+
+  pipeline :with_solid_demo_layout do
+    plug :put_root_layout, html: {ScorpiusSonnetWeb.Layouts, :solid_demo}
   end
 
   # 主应用路由
   scope "/", ScorpiusSonnetWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
+    get "/", MainHTML.MainController, :home
   end
 
   # Admin 路由
@@ -36,18 +68,59 @@ defmodule ScorpiusSonnetWeb.Router do
     get "/", DashboardController, :index
   end
 
-  # Demos 路由
+  # Demos 索引路由
   scope "/demos", ScorpiusSonnetWeb.Demos do
-    pipe_through :browser
+    pipe_through [:browser, :with_demos_layout]
 
-    get "/", DemoController, :index
-    get "/about", DemoController, :about
+    get "/", IndexHTML.IndexController, :index
+    get "/about", IndexHTML.IndexController, :about
+  end
 
-    # Demo 项目
-    get "/christmas", Christmas.PageController, :index
-    get "/christmas-meta", ChristmasMeta.PageController, :index
-    get "/counter", Counter.PageController, :index
-    get "/react-demo", ReactDemo.PageController, :index
+  # 各个Demo项目的独立路由
+  scope "/demos", ScorpiusSonnetWeb.Demos do
+    pipe_through [:browser]
+
+    # Christmas项目
+    scope "/christmas" do
+      pipe_through [:with_christmas_layout]
+      get "/", Christmas.PageController, :index
+    end
+
+    # Christmas Meta项目
+    scope "/christmas-meta" do
+      pipe_through [:with_christmas_meta_layout]
+      get "/", ChristmasMeta.PageController, :index
+    end
+
+    # Counter项目
+    scope "/counter" do
+      pipe_through [:with_counter_layout]
+      get "/", Counter.PageController, :index
+    end
+
+    # React Demo项目
+    scope "/react-demo" do
+      pipe_through [:with_react_demo_layout]
+      get "/", ReactDemo.PageController, :index
+    end
+
+    # Vue Demo项目 (如果存在)
+    scope "/vue-demo" do
+      pipe_through [:with_vue_demo_layout]
+      get "/", VueDemo.PageController, :index
+    end
+
+    # Svelte Demo项目 (如果存在)
+    scope "/svelte-demo" do
+      pipe_through [:with_svelte_demo_layout]
+      get "/", SvelteDemo.PageController, :index
+    end
+
+    # Solid Demo项目 (如果存在)
+    scope "/solid-demo" do
+      pipe_through [:with_solid_demo_layout]
+      get "/", SolidDemo.PageController, :index
+    end
   end
 
   # API 路由

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="csrf-token" content={get_csrf_token()} />
+    <.live_title suffix=" · React演示">
+      <%= assigns[:page_title] || "React Demo" %>
+    </.live_title>
+    <%= raw(VitePhx.vite_client("demos")) %>
+    <link rel="stylesheet" href={VitePhx.css_path("demos/react_demo/index")} />
+    <script type="module" src={VitePhx.asset_path("demos/react_demo/index")}>
+    </script>
+  </head>
+  <body class="bg-blue-50">
+    <main class="container mx-auto py-8">
+      <.flash_group flash={@flash} />
+      <%= @inner_content %>
+    </main>
+  </body>
+</html> 

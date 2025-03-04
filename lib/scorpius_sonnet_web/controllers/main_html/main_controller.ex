@@ -1,4 +1,4 @@
-defmodule ScorpiusSonnetWeb.PageController do
+defmodule ScorpiusSonnetWeb.MainHTML.MainController do
   use ScorpiusSonnetWeb, :controller
 
   def home(conn, _params) do
