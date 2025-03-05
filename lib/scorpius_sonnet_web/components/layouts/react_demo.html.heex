@@ -7,15 +7,23 @@
     <.live_title suffix=" · React演示">
       <%= assigns[:page_title] || "React Demo" %>
     </.live_title>
-    <%= raw(VitePhx.vite_client("demos")) %>
-    <link rel="stylesheet" href={VitePhx.css_path("demos/react_demo/index")} />
-    <script type="module" src={VitePhx.asset_path("demos/react_demo/index")}>
-    </script>
+    <link rel="stylesheet" href={VitePhx.css_path("demos/react-demo")} />
   </head>
   <body class="bg-blue-50">
     <main class="container mx-auto py-8">
       <.flash_group flash={@flash} />
       <%= @inner_content %>
     </main>
+    <script type="module">
+      import RefreshRuntime from "http://localhost:5173/@react-refresh"
+      RefreshRuntime.injectIntoGlobalHook(window)
+      window.$RefreshReg$ = () => {}
+      window.$RefreshSig$ = () => (type) => type
+      window.__vite_plugin_react_preamble_installed__ = true
+    </script>
+    <%= raw(VitePhx.vite_client("demos")) %>
+
+    <%# 使用entry_tags函数，一次性生成所有需要的资源标签 %>
+    <%= raw(VitePhx.entry_javascript_tags("demos/react-demo")) %>
   </body>
 </html> 

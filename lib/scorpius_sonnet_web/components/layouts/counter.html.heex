@@ -7,15 +7,36 @@
     <.live_title suffix=" · 计数器演示">
       <%= assigns[:page_title] || "Counter Demo" %>
     </.live_title>
-    <%= raw(VitePhx.vite_client("demos")) %>
-    <link rel="stylesheet" href={VitePhx.css_path("demos/counter/index")} />
-    <script type="module" src={VitePhx.asset_path("demos/counter/index")}>
-    </script>
+    <%= raw(VitePhx.entry_css_tags("demos/counter")) %>
+    <style>
+      body {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        line-height: 1.5;
+      }
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 0 1rem;
+      }
+      .mx-auto {
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .py-8 {
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+      }
+      .bg-gray-50 {
+        background-color: #f9fafb;
+      }
+    </style>
   </head>
   <body class="bg-gray-50">
     <main class="container mx-auto py-8">
       <.flash_group flash={@flash} />
       <%= @inner_content %>
     </main>
+    <%= raw(VitePhx.vite_client("demos")) %>
+    <%= raw(VitePhx.entry_javascript_tags("demos/counter")) %>
   </body>
 </html> 

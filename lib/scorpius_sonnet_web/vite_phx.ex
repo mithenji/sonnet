@@ -356,7 +356,57 @@ defmodule VitePhx do
   end
 
   @doc """
-  生成入口所需的所有资源标签
+  生成入口所需的CSS资源标签，用于放置在<head>标签中
+
+  ## 参数
+    - entry: 入口路径，例如 "demos/react-demo"
+
+  ## 示例
+      iex> VitePhx.entry_css_tags("demos/react-demo")
+      {:safe, "<link rel=\"stylesheet\" href=\"/demos/react-demo/styles.css\">"}
+  """
+  def entry_css_tags(entry) do
+    css_tag = resource_tag(fn -> css_path(entry) end, :link, %{rel: "stylesheet"})
+    css_tag
+  end
+
+  @doc """
+  生成入口所需的JavaScript资源标签，包括核心库，用于放置在<body>底部
+
+  ## 参数
+    - entry: 入口路径，例如 "demos/react-demo"
+    - options: 选项，例如 %{include_core_libs: true}
+
+  ## 示例
+      iex> VitePhx.entry_javascript_tags("demos/react-demo")
+      {:safe, "<script type=\"module\" src=\"/assets/core/core-react.js\"></script><script type=\"module\" src=\"/demos/react-demo/main.js\"></script>"}
+  """
+  def entry_javascript_tags(entry, options \\ %{}) do
+    opts = Map.merge(%{include_core_libs: true}, options)
+
+    tags = []
+
+    # 添加核心库标签
+    tags = if opts.include_core_libs do
+      core_libs_tag = entry_core_libs_tags(entry)
+      case core_libs_tag do
+        {:safe, ""} -> tags
+        {:safe, content} -> [content | tags]
+      end
+    else
+      tags
+    end
+
+    # 添加 JavaScript 标签
+    js_tag = "<script type=\"module\" src=\"#{asset_path(entry)}\"></script>"
+    tags = [js_tag | tags]
+
+    # 返回所有标签
+    {:safe, Enum.reverse(tags) |> Enum.join("\n")}
+  end
+
+  @doc """
+  生成入口所需的所有资源标签（向后兼容）
 
   ## 参数
     - entry: 入口路径，例如 "demos/react-demo"
@@ -397,7 +447,7 @@ defmodule VitePhx do
       tags
     end
 
-    # 添加 JS 标签
+    # 添加 JavaScript 标签
     tags = if opts.include_js do
       js_tag = "<script type=\"module\" src=\"#{asset_path(entry)}\"></script>"
       [js_tag | tags]
