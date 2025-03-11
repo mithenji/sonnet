@@ -449,7 +449,7 @@ module.exports = function (webpackEnv, entryItem, entryName) {
             //     patterns: [
             //         {
             //             from: path.resolve(__dirname, `../src/${entryName}/static/`),
-            //             to: path.resolve(__dirname, `../../apps/lucy_web/priv/static/resources/${entryName}/`)
+            //             to: path.resolve(__dirname, `../../apps/web/priv/static/resources/${entryName}/`)
             //         }
             //     ],
             // }),
