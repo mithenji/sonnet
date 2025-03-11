@@ -1,4 +1,4 @@
-import { BulletJs } from '../../../vendor/BulletJs.esm'
+import { BulletJs } from '../../../vendor/BulletJs.esm.js'
 
 const getRandom2 = (min, max) => parseInt(Math.random() * (max - min + 1)) + min;
 

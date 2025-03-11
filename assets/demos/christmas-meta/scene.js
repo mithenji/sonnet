@@ -4,7 +4,7 @@ import { EffectFade } from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/effect-fade'
 
-import { Bullet } from './components/Bullet'
+import { Bullet } from './components/Bullet.js'
 
 export class ChristmasScene {
   constructor(selector) {

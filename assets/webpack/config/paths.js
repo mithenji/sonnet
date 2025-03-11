@@ -22,8 +22,8 @@ const publicUrlOrPath = getPublicUrlOrPath(
 );
 
 // console.log( 'process.env.PUBLIC_URL =>',  process.env.PUBLIC_URL)
-const buildPath = process.env.BUILD_PATH || 'dist';
-const webBuildPath = process.env.BUILD_PATH || 'dist';
+const buildPath = process.env.BUILD_PATH || '../dist';
+const webBuildPath = process.env.BUILD_PATH || '../dist';
 
 const moduleFileExtensions = ['web.mjs', 'mjs', 'web.js', 'js', 'web.ts', 'ts', 'web.tsx', 'tsx', 'json', 'web.jsx', 'jsx', 'vue'];
 
@@ -42,12 +42,12 @@ const resolveModule = (resolveFn, filePath) => {
 
 const packageJson = require(resolveApp('./package.json'));
 
-const campaignEntryList = (entryList) => {
-    return entryList.reduce((acc, app) => {
-        acc[`${app}`] = resolveApp(`./src/${app}/index.js`);
-        return acc;
-    }, {});
-};
+// const campaignEntryList = (entryList) => {
+//     return entryList.reduce((acc, app) => {
+//         acc[`${app}`] = resolveApp(`./src/${app}/index.js`);
+//         return acc;
+//     }, {});
+// };
 
 // config after eject: we're in ./config/
 module.exports = {
@@ -70,7 +70,7 @@ module.exports = {
     appWebpackCache: resolveApp('node_modules/.cache'),
     appTsBuildInfoFile: resolveApp('node_modules/.cache/tsconfig.tsbuildinfo'),
     swSrc: resolveModule(resolveApp, 'src/service-worker'),
-    campaignEntryList: campaignEntryList(packageJson.campaigns),
+    // campaignEntryList: campaignEntryList(packageJson.campaigns),
     campaignsViewportWidth: packageJson.campaignsViewportWidth,
     publicUrlOrPath
 };

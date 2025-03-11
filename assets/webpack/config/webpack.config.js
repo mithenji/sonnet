@@ -1,9 +1,8 @@
-
 const fs = require('node:fs');
 const webpack = require('webpack');
 const resolve = require('resolve');
 const path = require('path');
-// const CopyPlugin = require("copy-webpack-plugin");
+const CopyPlugin = require("copy-webpack-plugin");
 // const TerserPlugin = require('terser-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
@@ -93,7 +92,7 @@ module.exports = function (webpackEnv, entryItem, entryName) {
                 options: {
                     postcssOptions: {
                         ident: 'postcss',
-                        config: true,
+                        config: false,
                         plugins: !useTailwind
                             ? [
                                 'postcss-flexbugs-fixes',
@@ -101,7 +100,14 @@ module.exports = function (webpackEnv, entryItem, entryName) {
                                 'postcss-normalize',
                                 ['postcss-px-to-viewport-8-plugin', { /* 你的配置 */ }],
                             ]
-                            : ['tailwindcss', 'postcss-flexbugs-fixes', ['postcss-preset-env', { autoprefixer: { flexbox: 'no-2009' }, stage: 3 }]],
+                            : [
+                                'postcss-import',
+                                '@tailwindcss/postcss',
+                                'postcss-flexbugs-fixes',
+                                ['postcss-preset-env', { autoprefixer: { flexbox: 'no-2009' }, stage: 3 }],
+                                'postcss-normalize',
+                                isEnvProduction && 'cssnano'
+                            ].filter(Boolean),
                     },
                     sourceMap: isEnvProduction ? shouldUseSourceMap : isEnvDevelopment,
                 },
@@ -127,22 +133,17 @@ module.exports = function (webpackEnv, entryItem, entryName) {
         entry: entryItem,
         output: {
             // The build folder.
-            path: paths.webAppBuild,            // Add /* filename */ comments to generated require()s in the output.
-            pathinfo: isEnvDevelopment,         // There will be one main bundle, and one file per asynchronous chunk.
-
-            // In development, it does not produce real files.
-            // filename: isEnvProduction ? 'javascript/[name].js' : isEnvDevelopment && 'javascript/[name].js',
-            filename: 'javascript/[name].js',   // There are also additional JS chunk files if you use code splitting.
-
-            // chunkFilename: isEnvProduction
-            //     ? 'static/javascript/[name].[contenthash:8].chunk.js'
-            //     : isEnvDevelopment && 'static/javascript/[name].chunk.js',
-            // assetModuleFilename: 'media/[name].[hash][ext]',
-
-            // webpack uses `publicPath` to determine where the app is being served from.
+            path: paths.webAppBuild,            
+            // Add /* filename */ comments to generated require()s in the output.
+            pathinfo: isEnvDevelopment,         
+            // There will be one main bundle, and one file per asynchronous chunk.
+            filename: 'javascript/[name].[contenthash:8].js',
+            chunkFilename: 'javascript/[name].[contenthash:8].chunk.js',
+            assetModuleFilename: 'assets/[name].[contenthash:8][ext]',
+            // webpack uses `publicPath` to determine where the app is served from.
             // It requires a trailing slash, or the file assets will get an incorrect path.
             // We inferred the "public path" (such as / or /my-project) from homepage.
-            publicPath: paths.publicUrlOrPath, // Point sourcemap entries to original disk location (format as URL on Windows)
+            publicPath: paths.publicUrlOrPath,
             devtoolModuleFilenameTemplate: isEnvProduction ? info => path.relative(paths.appSrc, info['absoluteResourcePath']).replace(/\\/g, '/') : isEnvDevelopment && (info => path.resolve(info['absoluteResourcePath']).replace(/\\/g, '/'))
         },
         cache: {
@@ -205,7 +206,9 @@ module.exports = function (webpackEnv, entryItem, entryName) {
         },
         resolve: {
             alias: {
-                'vue': 'vue/dist/vue.runtime.esm-bundler.js'
+                'vue': 'vue/dist/vue.runtime.esm-bundler.js',
+                'tailwindcss': path.resolve(paths.appNodeModules, 'tailwindcss'),
+                '/static': path.resolve(__dirname, '../../static')
             },
             // This allows you to set a fallback for where webpack should look for modules.
             // We placed these paths second because we want `node_modules` to "win"
@@ -247,7 +250,10 @@ module.exports = function (webpackEnv, entryItem, entryName) {
                             exclude: /node_modules/,
                             loader: require.resolve('babel-loader'),
                             options: {
-                                presets: [[require.resolve('@babel/preset-env'), {'loose': false}]],
+                                presets: [
+                                    [require.resolve('@babel/preset-env'), {'loose': false}],
+                                    require.resolve('@babel/preset-react')
+                                ],
                                 plugins: [
                                     require.resolve("@babel/plugin-proposal-class-properties"),
                                     require.resolve('@babel/plugin-proposal-private-methods'),
@@ -274,7 +280,7 @@ module.exports = function (webpackEnv, entryItem, entryName) {
                         },
                         {
                             test: /\.(mjs|jsx|ts|tsx)$/,
-                            include: paths.appSrc,
+                            exclude: /node_modules/,
                             loader: require.resolve('babel-loader'),
                             options: {
                                 customize: require.resolve('babel-preset-react-app/webpack-overrides'),
@@ -419,10 +425,43 @@ module.exports = function (webpackEnv, entryItem, entryName) {
                                 filename: ({filename}) => {
                                     // console.log('asset/resource pathData =>', pathData, 'asset/resource assetInfo =>', assetInfo);
                                     let itemFilename = filename.includes('assets') ? filename.replace('src/', '').split(/\/assets\//)[0] : ''
-                                    return `assets/${itemFilename}/[name][contenthash][ext]`;
+                                    return `assets/${itemFilename}/[name].[contenthash:8][ext]`;
                                 }
                             }
-                        }]
+                        },
+                        {
+                            test: /\.(jsx|tsx)$/,
+                            exclude: /node_modules/,
+                            loader: require.resolve('babel-loader'),
+                            options: {
+                                presets: [
+                                    [require.resolve('@babel/preset-env'), {'loose': false}],
+                                    [require.resolve('@babel/preset-react'), {
+                                        runtime: hasJsxRuntime ? 'automatic' : 'classic'
+                                    }]
+                                ],
+                                plugins: [
+                                    require.resolve("@babel/plugin-proposal-class-properties"),
+                                    require.resolve('@babel/plugin-proposal-private-methods'),
+                                    require.resolve('@babel/plugin-proposal-private-property-in-object'),
+                                    [
+                                        require("@babel/plugin-transform-runtime").default,
+                                        {
+                                            corejs: false,
+                                            helpers: true,
+                                            version: require("@babel/runtime/package.json").version,
+                                            regenerator: true,
+                                            useESModules: true,
+                                            absoluteRuntime: path.dirname(require.resolve("@babel/runtime/package.json"))
+                                        }
+                                    ]
+                                ],
+                                cacheDirectory: true,
+                                cacheCompression: false,
+                                compact: isEnvProduction
+                            }
+                        }
+                    ]
                 }].filter(Boolean)
         },
         plugins: [
@@ -441,20 +480,21 @@ module.exports = function (webpackEnv, entryItem, entryName) {
             new MiniCssExtractPlugin({
                 // Options similar to the same options in webpackOptions.output
                 // both options are optional.
-                filename: 'styles/[name].css', runtime: false
-                // chunkFilename: 'static/css/[name].[contenthash:8].chunk.css'
+                filename: 'styles/[name].[contenthash:8].css',
+                chunkFilename: 'styles/[name].[contenthash:8].chunk.css',
+                runtime: false
+            }),
+            
+            // 复制静态资源
+            new CopyPlugin({
+                patterns: [
+                    { 
+                        from: path.resolve(__dirname, "../../static"), 
+                        to: "static" 
+                    }
+                ],
             }),
 
-            // fs.existsSync(path.resolve(__dirname, `../src/${entryName}/static/`)) && new CopyPlugin({
-            //     patterns: [
-            //         {
-            //             from: path.resolve(__dirname, `../src/${entryName}/static/`),
-            //             to: path.resolve(__dirname, `../../apps/web/priv/static/resources/${entryName}/`)
-            //         }
-            //     ],
-            // }),
-
-            
             // Generate an asset manifest file with the following content:
             // - "files" key: Mapping of all asset filenames to their corresponding
             //   output file so that tools can pick it up without having to parse
@@ -462,12 +502,12 @@ module.exports = function (webpackEnv, entryItem, entryName) {
             // - "entrypoints" key: Array of files which are included in `index.html`,
             //   can be used to reconstruct the HTML if necessary
             new WebpackManifestPlugin({
-                fileName: `${entryName}_asset_manifest.json`,
+                fileName: `manifest.json`,
                 publicPath: paths.publicUrlOrPath,
                 generate: (seed, files, entrypoints) => {
-
                     const manifestFiles = files.reduce((manifest, file) => {
-                        manifest[file.name] = file.path;
+                        const cleanPath = file.path.replace(/\/+/g, '/');
+                        manifest[file.name.replace(/\.[0-9a-f]{8}\.(js|css|chunk\.js|chunk\.css)$/, '.$1')] = cleanPath;
                         return manifest;
                     }, seed);
 
@@ -476,9 +516,9 @@ module.exports = function (webpackEnv, entryItem, entryName) {
                         return previousValue;
                     }, {});
 
-                    // console.log('WebpackManifestPlugin', manifestFiles, entrypointFiles);
                     return {
-                        files: manifestFiles, entrypoints: entrypointFiles
+                        files: manifestFiles,
+                        entrypoints: entrypointFiles
                     };
                 }
             }),
