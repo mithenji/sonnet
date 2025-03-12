@@ -217,42 +217,63 @@ defmodule ViteConfig do
 
   # 构建资源路径
   def build_path(entry, type) do
-    # 检查是否是特殊路径
-    case get_special_path(entry) do
-      nil ->
-        # 不是特殊路径，使用入口配置
-        [main_entry | sub_entries] = String.split(entry, "/")
-        sub_entry = if length(sub_entries) > 0, do: hd(sub_entries), else: "default"
+    build_path_with_rules(entry, type, get_special_path(entry))
+  end
 
-        # 获取路径规则
-        path_rules = get_entry_config(entry, :path_rules)
+  # 处理特殊路径配置
+  # 当路径有特殊配置时，直接返回特殊配置的路径
+  defp build_path_with_rules(entry, type, special_config) when not is_nil(special_config) do
+    case Map.get(special_config, :prod_path) do
+      path when is_binary(path) -> path
+      path_map when is_map(path_map) -> Map.get(path_map, type, "/#{entry}")
+      _ -> "/#{entry}"
+    end
+  end
 
-        if path_rules do
-          rule = Map.get(path_rules, type)
+  # 处理普通路径配置
+  # 将入口路径解析为主入口和子入口，并应用相应的路径规则
+  defp build_path_with_rules(entry, type, nil) do
+    with [main_entry | sub_entries] <- String.split(entry, "/"),
+         sub_entry <- get_sub_entry(sub_entries),
+         path_rules when not is_nil(path_rules) <- get_entry_config(entry, :path_rules) do
+      build_path_from_rules(main_entry, sub_entry, type, path_rules)
+    else
+      _ -> nil
+    end
+  end
 
-          cond do
-            is_function(rule, 1) -> rule.(entry)
-            is_function(rule, 2) -> rule.(main_entry, sub_entry)
-            is_binary(rule) -> rule
-            true -> "/#{entry}"
-          end
-        else
-          # 没有找到路径规则，使用默认规则
-          case type do
-            :js -> "/#{entry}/main"
-            :css -> "/#{entry}/styles/index"
-            :media -> "/assets/images/#{entry}"
-            _ -> "/#{entry}"
-          end
-        end
+  # 获取子入口名称
+  # 如果没有子入口则返回 "default"，否则返回第一个子入口
+  defp get_sub_entry([]), do: "default"
+  defp get_sub_entry([head | _]), do: head
 
-      special_config ->
-        # 是特殊路径，使用特殊配置
-        case Map.get(special_config, :prod_path) do
-          path when is_binary(path) -> path
-          path_map when is_map(path_map) -> Map.get(path_map, type, "/#{entry}")
-          _ -> "/#{entry}"
-        end
+  # 根据路径规则构建最终路径
+  # 支持三种规则类型：
+  # 1. 单参数函数规则：接收完整入口路径
+  # 2. 双参数函数规则：分别接收主入口和子入口
+  # 3. 字符串规则：直接作为路径返回
+  defp build_path_from_rules(main_entry, sub_entry, type, path_rules) do
+    case Map.get(path_rules, type) do
+      rule when is_function(rule, 1) ->
+        rule.("#{main_entry}/#{sub_entry}")
+      rule when is_function(rule, 2) ->
+        rule.(main_entry, sub_entry)
+      rule when is_binary(rule) ->
+        rule
+      _ ->
+        build_default_path(main_entry, sub_entry, type)
+    end
+  end
+
+  # 构建默认路径
+  # 根据资源类型生成标准格式的路径
+  defp build_default_path(main_entry, sub_entry, type) do
+    entry = "#{main_entry}/#{sub_entry}"
+    case type do
+      :js -> "/#{entry}/main"
+      :css -> "/#{entry}/styles/index"
+      :media -> "/assets/images/#{entry}"
+      _ -> "/#{entry}"
     end
   end
 end

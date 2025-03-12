@@ -168,22 +168,32 @@ defmodule VitePhx do
 
     # 开发环境下返回 nil 或开发路径
     if Mix.env() == :dev do
-      if special_config, do: special_config.dev_path, else: config.dev_path
+      get_dev_path(special_config, config)
     else
-      # 生产环境：优先从 manifest 获取路径
-      case get_manifest_entry("#{lib_name}.js") do
-        nil ->
-          # 如果 manifest 中没有找到，则使用配置系统构建路径
-          if special_config do
-            special_config.prod_path
-          else
-            find_in_manifest_by_pattern(config.path)
-          end
+      get_prod_path(lib_name, special_config, config)
+    end
+  end
 
-        manifest_entry ->
-          # 使用 manifest 中的文件路径
-          "/#{manifest_entry["file"]}"
-      end
+  # 获取开发环境路径
+  defp get_dev_path(special_config, config) do
+    if special_config, do: special_config.dev_path, else: config.dev_path
+  end
+
+  # 获取生产环境路径
+  defp get_prod_path(lib_name, special_config, config) do
+    # 优先从 manifest 获取路径
+    case get_manifest_entry("#{lib_name}.js") do
+      nil -> get_fallback_path(special_config, config, lib_name)
+      manifest_entry -> "/#{manifest_entry["file"]}"
+    end
+  end
+
+  # 获取备用路径（当 manifest 中没有找到时）
+  defp get_fallback_path(special_config, config, _lib_name) do
+    if special_config do
+      special_config.prod_path
+    else
+      find_in_manifest_by_pattern(config.path)
     end
   end
 
@@ -270,13 +280,15 @@ defmodule VitePhx do
         {:safe, ""}
 
       path ->
-        attrs =
-          attributes
-          |> Enum.map(fn {key, value} -> "#{key}=\"#{value}\"" end)
-          |> Enum.join(" ")
-
+        attrs = build_html_attributes(attributes)
         {:safe, "<script #{attrs} src=\"#{path}\"></script>"}
     end
+  end
+
+  # 构建 HTML 属性字符串，将属性映射转换为格式化的字符串
+  # 例如：%{type: "module", src: "path"} -> 'type="module" src="path"'
+  defp build_html_attributes(attributes) do
+    Enum.map_join(attributes, " ", fn {key, value} -> "#{key}=\"#{value}\"" end)
   end
 
   @doc """
@@ -294,24 +306,20 @@ defmodule VitePhx do
   def core_libs_script_tags(lib_names, attributes \\ %{type: "module"}) do
     tags =
       lib_names
-      |> Enum.map(fn lib_name ->
-        case core_lib_path(lib_name) do
-          nil ->
-            ""
-
-          path ->
-            attrs =
-              attributes
-              |> Enum.map(fn {key, value} -> "#{key}=\"#{value}\"" end)
-              |> Enum.join(" ")
-
-            "<script #{attrs} src=\"#{path}\"></script>"
-        end
-      end)
-      |> Enum.filter(fn tag -> tag != "" end)
+      |> Enum.map(&build_core_lib_tag(&1, attributes))
+      |> Enum.filter(&(&1 != ""))
       |> Enum.join("")
 
     {:safe, tags}
+  end
+
+  # 构建单个核心库的脚本标签
+  # 如果核心库路径不存在则返回空字符串，否则返回完整的 script 标签
+  defp build_core_lib_tag(lib_name, attributes) do
+    case core_lib_path(lib_name) do
+      nil -> ""
+      path -> "<script #{build_html_attributes(attributes)} src=\"#{path}\"></script>"
+    end
   end
 
   @doc """
@@ -354,19 +362,19 @@ defmodule VitePhx do
         {:safe, ""}
 
       path ->
-        attrs =
-          attributes
-          |> Enum.map(fn {key, value} -> "#{key}=\"#{value}\"" end)
-          |> Enum.join(" ")
-
-        tag_content =
-          case tag_type do
-            :script -> "<script #{attrs} src=\"#{path}\"></script>"
-            :link -> "<link #{attrs} href=\"#{path}\">"
-            _ -> ""
-          end
-
+        attrs = build_html_attributes(attributes)
+        tag_content = build_tag_content(tag_type, attrs, path)
         {:safe, tag_content}
+    end
+  end
+
+  # 根据标签类型构建 HTML 标签内容
+  # 支持 :script 和 :link 类型，其他类型返回空字符串
+  defp build_tag_content(tag_type, attrs, path) do
+    case tag_type do
+      :script -> "<script #{attrs} src=\"#{path}\"></script>"
+      :link -> "<link #{attrs} href=\"#{path}\">"
+      _ -> ""
     end
   end
 
