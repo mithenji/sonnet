@@ -32,8 +32,17 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: 'assets/package-lock.json'
+
+      - name: Cache npm dependencies
+        uses: actions/cache@v4
+        id: npm-cache
+        with:
+          path: |
+            ~/.npm
+            assets/node_modules
+          key: ${{ runner.os }}-npm-${{ hashFiles('assets/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
 
       - name: Install and build frontend assets
         working-directory: ./assets
