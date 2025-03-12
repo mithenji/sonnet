@@ -113,12 +113,14 @@ defmodule ViteConfig do
       # 核心库
       "core-react" => %{
         path: "assets/core/core-react",
-        dev_path: nil,  # 开发环境下不需要引入
+        # 开发环境下不需要引入
+        dev_path: nil,
         prod_path: "/assets/core/core-react"
       },
       "core-vue" => %{
         path: "assets/core/core-vue",
-        dev_path: nil,  # 开发环境下不需要引入
+        # 开发环境下不需要引入
+        dev_path: nil,
         prod_path: "/assets/core/core-vue"
       },
       # 共享资源
@@ -138,11 +140,13 @@ defmodule ViteConfig do
     %{
       "core-react" => %{
         path: "assets/core/core-react",
-        dev_path: nil  # 开发环境下不需要引入
+        # 开发环境下不需要引入
+        dev_path: nil
       },
       "core-vue" => %{
         path: "assets/core/core-vue",
-        dev_path: nil  # 开发环境下不需要引入
+        # 开发环境下不需要引入
+        dev_path: nil
       }
     }
   end
@@ -152,12 +156,14 @@ defmodule ViteConfig do
     %{
       "swiper" => %{
         path: "assets/packages/swiper/index",
-        dev_path: nil,  # 开发环境下不需要引入
+        # 开发环境下不需要引入
+        dev_path: nil,
         prod_path: "/assets/packages/swiper/index"
       },
       "lodash" => %{
         path: "assets/packages/lodash/index",
-        dev_path: nil,  # 开发环境下不需要引入
+        # 开发环境下不需要引入
+        dev_path: nil,
         prod_path: "/assets/packages/lodash/index"
       }
     }
@@ -198,7 +204,10 @@ defmodule ViteConfig do
 
   # 获取包配置
   def get_package_config(package_name) do
-    Map.get(packages(), package_name, %{path: "assets/packages/#{package_name}/index", dev_path: nil})
+    Map.get(packages(), package_name, %{
+      path: "assets/packages/#{package_name}/index",
+      dev_path: nil
+    })
   end
 
   # 获取特殊路径配置

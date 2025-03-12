@@ -30,6 +30,7 @@ defmodule VitePhx do
         nil ->
           # 如果 manifest 中没有找到，则使用配置系统构建路径
           ViteConfig.build_path(entry, type)
+
         manifest_entry ->
           # 使用 manifest 中的文件路径
           "/#{manifest_entry["file"]}"
@@ -94,6 +95,7 @@ defmodule VitePhx do
         nil ->
           # 如果没有找到，尝试直接在文件系统中查找
           find_in_filesystem(pattern)
+
         key ->
           # 返回实际文件路径
           "/#{manifest[key]["file"]}"
@@ -114,6 +116,7 @@ defmodule VitePhx do
       [] ->
         # 没有找到匹配的文件，返回默认路径
         "/#{pattern}.js"
+
       [file | _] ->
         # 找到匹配的文件，返回相对路径
         "/" <> Path.relative_to(file, static_dir)
@@ -176,6 +179,7 @@ defmodule VitePhx do
           else
             find_in_manifest_by_pattern(config.path)
           end
+
         manifest_entry ->
           # 使用 manifest 中的文件路径
           "/#{manifest_entry["file"]}"
@@ -262,11 +266,14 @@ defmodule VitePhx do
   """
   def script_tag_if_exists(path_func, attributes \\ %{type: "module"}) do
     case path_func.() do
-      nil -> {:safe, ""}
+      nil ->
+        {:safe, ""}
+
       path ->
-        attrs = attributes
-        |> Enum.map(fn {key, value} -> "#{key}=\"#{value}\"" end)
-        |> Enum.join(" ")
+        attrs =
+          attributes
+          |> Enum.map(fn {key, value} -> "#{key}=\"#{value}\"" end)
+          |> Enum.join(" ")
 
         {:safe, "<script #{attrs} src=\"#{path}\"></script>"}
     end
@@ -285,20 +292,24 @@ defmodule VitePhx do
       {:safe, ""}  # 开发环境
   """
   def core_libs_script_tags(lib_names, attributes \\ %{type: "module"}) do
-    tags = lib_names
-    |> Enum.map(fn lib_name ->
-      case core_lib_path(lib_name) do
-        nil -> ""
-        path ->
-          attrs = attributes
-          |> Enum.map(fn {key, value} -> "#{key}=\"#{value}\"" end)
-          |> Enum.join(" ")
+    tags =
+      lib_names
+      |> Enum.map(fn lib_name ->
+        case core_lib_path(lib_name) do
+          nil ->
+            ""
 
-          "<script #{attrs} src=\"#{path}\"></script>"
-      end
-    end)
-    |> Enum.filter(fn tag -> tag != "" end)
-    |> Enum.join("")
+          path ->
+            attrs =
+              attributes
+              |> Enum.map(fn {key, value} -> "#{key}=\"#{value}\"" end)
+              |> Enum.join(" ")
+
+            "<script #{attrs} src=\"#{path}\"></script>"
+        end
+      end)
+      |> Enum.filter(fn tag -> tag != "" end)
+      |> Enum.join("")
 
     {:safe, tags}
   end
@@ -339,17 +350,21 @@ defmodule VitePhx do
   """
   def resource_tag(path_func, tag_type, attributes) do
     case path_func.() do
-      nil -> {:safe, ""}
-      path ->
-        attrs = attributes
-        |> Enum.map(fn {key, value} -> "#{key}=\"#{value}\"" end)
-        |> Enum.join(" ")
+      nil ->
+        {:safe, ""}
 
-        tag_content = case tag_type do
-          :script -> "<script #{attrs} src=\"#{path}\"></script>"
-          :link -> "<link #{attrs} href=\"#{path}\">"
-          _ -> ""
-        end
+      path ->
+        attrs =
+          attributes
+          |> Enum.map(fn {key, value} -> "#{key}=\"#{value}\"" end)
+          |> Enum.join(" ")
+
+        tag_content =
+          case tag_type do
+            :script -> "<script #{attrs} src=\"#{path}\"></script>"
+            :link -> "<link #{attrs} href=\"#{path}\">"
+            _ -> ""
+          end
 
         {:safe, tag_content}
     end
@@ -387,15 +402,17 @@ defmodule VitePhx do
     tags = []
 
     # 添加核心库标签
-    tags = if opts.include_core_libs do
-      core_libs_tag = entry_core_libs_tags(entry)
-      case core_libs_tag do
-        {:safe, ""} -> tags
-        {:safe, content} -> [content | tags]
+    tags =
+      if opts.include_core_libs do
+        core_libs_tag = entry_core_libs_tags(entry)
+
+        case core_libs_tag do
+          {:safe, ""} -> tags
+          {:safe, content} -> [content | tags]
+        end
+      else
+        tags
       end
-    else
-      tags
-    end
 
     # 添加 JavaScript 标签
     js_tag = "<script type=\"module\" src=\"#{asset_path(entry)}\"></script>"
@@ -417,43 +434,52 @@ defmodule VitePhx do
       {:safe, "...所有资源标签..."}
   """
   def entry_tags(entry, options \\ %{}) do
-    opts = Map.merge(%{
-      include_css: true,
-      include_js: true,
-      include_core_libs: true
-    }, options)
+    opts =
+      Map.merge(
+        %{
+          include_css: true,
+          include_js: true,
+          include_core_libs: true
+        },
+        options
+      )
 
     tags = []
 
     # 添加 CSS 标签
-    tags = if opts.include_css do
-      css_tag = resource_tag(fn -> css_path(entry) end, :link, %{rel: "stylesheet"})
-      case css_tag do
-        {:safe, ""} -> tags
-        {:safe, content} -> [content | tags]
+    tags =
+      if opts.include_css do
+        css_tag = resource_tag(fn -> css_path(entry) end, :link, %{rel: "stylesheet"})
+
+        case css_tag do
+          {:safe, ""} -> tags
+          {:safe, content} -> [content | tags]
+        end
+      else
+        tags
       end
-    else
-      tags
-    end
 
     # 添加核心库标签
-    tags = if opts.include_core_libs do
-      core_libs_tag = entry_core_libs_tags(entry)
-      case core_libs_tag do
-        {:safe, ""} -> tags
-        {:safe, content} -> [content | tags]
+    tags =
+      if opts.include_core_libs do
+        core_libs_tag = entry_core_libs_tags(entry)
+
+        case core_libs_tag do
+          {:safe, ""} -> tags
+          {:safe, content} -> [content | tags]
+        end
+      else
+        tags
       end
-    else
-      tags
-    end
 
     # 添加 JavaScript 标签
-    tags = if opts.include_js do
-      js_tag = "<script type=\"module\" src=\"#{asset_path(entry)}\"></script>"
-      [js_tag | tags]
-    else
-      tags
-    end
+    tags =
+      if opts.include_js do
+        js_tag = "<script type=\"module\" src=\"#{asset_path(entry)}\"></script>"
+        [js_tag | tags]
+      else
+        tags
+      end
 
     # 返回所有标签
     {:safe, Enum.reverse(tags) |> Enum.join("\n")}

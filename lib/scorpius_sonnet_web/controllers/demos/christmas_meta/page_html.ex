@@ -3,8 +3,7 @@ defmodule ScorpiusSonnetWeb.Demos.ChristmasMeta.PageHTML do
 
   def index(assigns) do
     ~H"""
-    <div id="container-christmas-meta">
-    </div>
+    <div id="container-christmas-meta"></div>
     """
   end
 

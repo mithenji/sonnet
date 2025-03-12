@@ -33,7 +33,7 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-          cache-dependency-path: '**/package-lock.json'
+          cache-dependency-path: 'assets/package-lock.json'
 
       - name: Install and build frontend assets
         working-directory: ./assets
