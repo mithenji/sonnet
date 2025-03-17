@@ -256,10 +256,13 @@ defmodule ViteConfig do
     case Map.get(path_rules, type) do
       rule when is_function(rule, 1) ->
         rule.("#{main_entry}/#{sub_entry}")
+
       rule when is_function(rule, 2) ->
         rule.(main_entry, sub_entry)
+
       rule when is_binary(rule) ->
         rule
+
       _ ->
         build_default_path(main_entry, sub_entry, type)
     end
@@ -269,6 +272,7 @@ defmodule ViteConfig do
   # 根据资源类型生成标准格式的路径
   defp build_default_path(main_entry, sub_entry, type) do
     entry = "#{main_entry}/#{sub_entry}"
+
     case type do
       :js -> "/#{entry}/main"
       :css -> "/#{entry}/styles/index"
